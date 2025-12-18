@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Manajemen Kategori</title>
+<link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+
+<h1>Manajemen Kategori Kas</h1>
+
+<form th:action="@{/categories}" th:object="${category}" method="post">
+
+    <label>Nama Kategori:
+        <input type="text" th:field="*{name}" required>
+    </label>
+
+    <!-- ✅ VALIDASI HARUS DI DALAM FORM -->
+    <p th:if="${#fields.hasErrors('name')}"
+       th:errors="*{name}"></p>
+
+    <button type="submit">Simpan</button>
+</form>
+
+<hr>
+
+<h2>Daftar Kategori</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nama</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="c : ${categories}">
+            <td th:text="${c.id}"></td>
+            <td th:text="${c.name}"></td>
+        </tr>
+    </tbody>
+</table>
+
+<p>
+    <a href="/transactions/new">Tambah Transaksi</a> |
+    <a href="/">Dashboard</a>
+</p>
+
+</body>
+</html>

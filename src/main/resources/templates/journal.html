@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Jurnal Umum</title>
+<link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="container">
+
+<h1>Jurnal Umum</h1>
+
+<div class="nav">
+    <a href="/transactions">Transaksi</a>
+    <a href="/categories">Kategori</a>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>Tanggal</th>
+        <th>Debit</th>
+        <th>Kredit</th>
+        <th>Jumlah</th>
+        <th>Keterangan</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="j : ${journals}">
+        <td th:text="${j.date}"></td>
+        <td th:text="${j.debitAccount}"></td>
+        <td th:text="${j.creditAccount}"></td>
+        <td th:text="${j.amount}"></td>
+        <td th:text="${j.transaction.description}"></td>
+    </tr>
+    </tbody>
+</table>
+
+</div>
+</body>
+</html>
