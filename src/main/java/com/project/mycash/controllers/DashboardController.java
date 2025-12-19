@@ -14,16 +14,15 @@ import java.util.Comparator;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
-
-
 @Controller
 @RequiredArgsConstructor
 public class DashboardController {
     private final CashTransactionRepository txRepo;
 
-    @GetMapping({"/", "/dashboard"})
+    @GetMapping({ "/", "/dashboard" })
     public String dashboard(Model model, HttpSession session) {
-        if (session.getAttribute("user") == null) return "redirect:/login";
+        if (session.getAttribute("user") == null)
+            return "redirect:/login";
 
         BigDecimal totalIn = txRepo.findAll().stream()
                 .filter(t -> t.getType() == TransactionType.IN)
@@ -36,7 +35,8 @@ public class DashboardController {
         model.addAttribute("totalIn", totalIn);
         model.addAttribute("totalOut", totalOut);
         model.addAttribute("balance", totalIn.subtract(totalOut));
-        model.addAttribute("recent", txRepo.findAll().stream().sorted(Comparator.comparing(CashTransaction::getDate).reversed()).limit(10).toList());
+        model.addAttribute("recent", txRepo.findAll().stream()
+                .sorted(Comparator.comparing(CashTransaction::getDate).reversed()).limit(10).toList());
         return "index";
     }
 }

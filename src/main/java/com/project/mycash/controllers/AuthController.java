@@ -18,37 +18,36 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/register")
-public String registerForm(Model model) {
-    model.addAttribute("user", new User());
-    return "register";
-}
-
-@PostMapping("/register")
-public String doRegister(
-        @ModelAttribute User user,
-        Model model) {
-
-    // VALIDASI MANUAL
-    if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
-        model.addAttribute("error", "Username wajib diisi");
+    public String registerForm(Model model) {
+        model.addAttribute("user", new User());
         return "register";
     }
 
-    if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
-        model.addAttribute("error", "Password wajib diisi");
-        return "register";
+    @PostMapping("/register")
+    public String doRegister(
+            @ModelAttribute User user,
+            Model model) {
+
+        // VALIDASI MANUAL
+        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+            model.addAttribute("error", "Username wajib diisi");
+            return "register";
+        }
+
+        if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+            model.addAttribute("error", "Password wajib diisi");
+            return "register";
+        }
+
+        // CEK USERNAME SUDAH ADA
+        if (authService.existsByUsername(user.getUsername())) {
+            model.addAttribute("error", "Username sudah digunakan");
+            return "register";
+        }
+
+        authService.register(user);
+        return "redirect:/login";
     }
-
-    // CEK USERNAME SUDAH ADA
-    if (authService.existsByUsername(user.getUsername())) {
-        model.addAttribute("error", "Username sudah digunakan");
-        return "register";
-    }
-
-    authService.register(user);
-    return "redirect:/login";
-}
-
 
     @GetMapping("/login")
     public String loginForm() {

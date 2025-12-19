@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Konfirmasi Hapus</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}" />
+  </head>
+  <body>
+    <div class="layout">
+      <div th:replace="fragments/sidebar :: sidebar"></div>
+
+      <main class="content">
+        <div class="container">
+          <h2>Konfirmasi Hapus Transaksi</h2>
+
+          <p>
+            Tanggal:
+            <b th:text="${transaction.date}"></b>
+          </p>
+
+          <p>
+            Jumlah:
+            <b>
+              Rp
+              <span
+                th:text="${#numbers.formatDecimal(transaction.amount,0,'POINT',2,'COMMA')}"
+              ></span>
+            </b>
+          </p>
+
+          <p>
+            Deskripsi:
+            <b th:text="${transaction.description}"></b>
+          </p>
+
+          <div class="action-bar">
+            <a th:href="@{/transactions}" class="btn">Batal</a>
+
+            <a
+              th:href="@{'/transactions/delete/' + ${transaction.id}}"
+              class="danger"
+            >
+              Ya, Hapus
+            </a>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,4 +1,5 @@
 package com.project.mycash.controllers;
+
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Controller;
@@ -16,7 +17,8 @@ import com.project.mycash.services.CashTransactionService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 @Controller
 @RequiredArgsConstructor
@@ -25,54 +27,69 @@ public class CashTransactionController {
     private final CategoryKasRepository categoryRepo;
 
     @GetMapping("/transactions")
-    public String list(@RequestParam(required = false) LocalDate start,
-                       @RequestParam(required = false) LocalDate end,
-                       Model model) {
-        if (start == null) start = LocalDate.now().withDayOfMonth(1);
-        if (end == null) end = LocalDate.now();
+    public String list(
+            @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate start,
+
+            @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate end,
+
+            Model model) {
+        if (start == null)
+            start = LocalDate.now().withDayOfMonth(1);
+        if (end == null)
+            end = LocalDate.now();
+
         List<CashTransaction> list = service.findByPeriod(start, end);
+
         model.addAttribute("transactions", list);
         model.addAttribute("start", start);
         model.addAttribute("end", end);
+
         return "transactions/list";
     }
 
-@GetMapping("/transactions/new")
-public String createForm(Model model) {
-    model.addAttribute("transaction",
-        CashTransaction.builder().date(LocalDate.now()).build());
-    model.addAttribute("types", TransactionType.values());
-    model.addAttribute("categories", categoryRepo.findAll());
-    return "transactions/form";
-}
+    @GetMapping("/transactions/new")
+    public String createForm(Model model) {
+        model.addAttribute("transaction",
+                CashTransaction.builder().date(LocalDate.now()).build());
+        model.addAttribute("types", TransactionType.values());
+        model.addAttribute("categories", categoryRepo.findAll());
+        return "transactions/form";
+    }
 
     @PostMapping("/transactions")
-public String save(
-        @Valid @ModelAttribute("transaction") CashTransaction transaction,
-        BindingResult result,
-        Model model
-){ if (result.hasErrors()) {
-    model.addAttribute("types", TransactionType.values());
-    model.addAttribute("categories", categoryRepo.findAll());
-    return "transactions/form";
-}
+    public String save(
+            @Valid @ModelAttribute("transaction") CashTransaction transaction,
+            BindingResult result,
+            Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("types", TransactionType.values());
+            model.addAttribute("categories", categoryRepo.findAll());
+            return "transactions/form";
+        }
 
-    service.save(transaction);
-    return "redirect:/transactions";
-}
+        service.save(transaction);
+        return "redirect:/transactions";
+    }
 
-@GetMapping("/transactions/edit/{id}")
-public String editForm(@PathVariable Long id, Model model) {
-    CashTransaction tx = service.findById(id);
-    model.addAttribute("transaction", tx);
-    model.addAttribute("types", TransactionType.values());
-    model.addAttribute("categories", categoryRepo.findAll());
-    return "transactions/form";
-}
+    @GetMapping("/transactions/edit/{id}")
+    public String editForm(@PathVariable Long id, Model model) {
+        CashTransaction tx = service.findById(id);
+        model.addAttribute("transaction", tx);
+        model.addAttribute("types", TransactionType.values());
+        model.addAttribute("categories", categoryRepo.findAll());
+        return "transactions/form";
+    }
 
-    @PostMapping("/transactions/delete/{id}")
+    @GetMapping("/transactions/delete/{id}")
     public String delete(@PathVariable Long id) {
         service.delete(id);
         return "redirect:/transactions";
+    }
+
+    @GetMapping("/transactions/confirm-delete/{id}")
+    public String confirmDelete(@PathVariable Long id, Model model) {
+        CashTransaction tx = service.findById(id);
+        model.addAttribute("transaction", tx);
+        return "transactions/confirm-delete";
     }
 }

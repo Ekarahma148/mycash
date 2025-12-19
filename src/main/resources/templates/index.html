@@ -1,48 +1,48 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/app.css}">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" th:href="@{/css/app.css}" />
+    <title>Dashboard</title>
+  </head>
+  <body>
+    <div th:replace="fragments/sidebar :: sidebar"></div>
 
-<div class="layout">
-
-    <aside class="sidebar">
-        <h2>MyCash</h2>
-        <nav>
-            <a href="/dashboard">Dashboard</a>
-            <a href="/transactions">Transaksi</a>
-            <a href="/journals">Jurnal</a>
-            <a href="/categories">Kategori</a>
-            <a href="/logout" class="logout">Logout</a>
-        </nav>
-    </aside>
-
-<main class="content">
-    <div class="container">
-
+    <main class="content">
+      <div class="container">
         <h1>Dashboard</h1>
 
         <div class="dashboard">
-            <div class="card">
-                <h3>Kas Masuk</h3>
-                <p th:text="${totalIn}"></p>
-            </div>
-            <div class="card">
-                <h3>Kas Keluar</h3>
-                <p th:text="${totalOut}"></p>
-            </div>
-            <div class="card">
-                <h3>Saldo</h3>
-                <p th:text="${balance}"></p>
-            </div>
+          <div class="card">
+            <h3>Kas Masuk</h3>
+            <p>
+              Rp
+              <span
+                th:text="${#numbers.formatDecimal(totalIn, 0, 'POINT', 2, 'COMMA')}"
+              ></span>
+            </p>
+          </div>
+          <div class="card">
+            <h3>Kas Keluar</h3>
+            <p>
+              Rp
+              <span
+                th:text="${#numbers.formatDecimal(totalOut, 0, 'POINT', 2, 'COMMA')}"
+              ></span>
+            </p>
+          </div>
+          <div class="card">
+            <h3>Saldo</h3>
+            <p>
+              Rp
+              <span
+                th:text="${#numbers.formatDecimal(balance, 0, 'POINT', 2, 'COMMA')}"
+              ></span>
+            </p>
+          </div>
         </div>
-
-    </div>
-</main>
-
-</div>
-
-</body>
+      </div>
+    </main>
+  </body>
 </html>

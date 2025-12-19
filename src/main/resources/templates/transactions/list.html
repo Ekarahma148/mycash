@@ -1,70 +1,75 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Transaksi Kas</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
-</head>
-<body>
+    <link rel="stylesheet" th:href="@{/css/app.css}" />
+  </head>
+  <body>
+    <div class="layout">
+      <div th:replace="fragments/sidebar :: sidebar"></div>
 
-<div class="container">
+      <main class="content">
+        <div class="container">
+          <h1>Daftar Transaksi Kas</h1>
 
-    <div class="nav">
-        <a href="/dashboard">Dashboard</a>
-        <a href="/transactions">Transaksi</a>
-        <a href="/journals">Jurnal</a>
+          <form method="get" action="/transactions" class="filter-form">
+            <label
+              >Mulai
+              <input type="date" name="start" th:value="${start}" />
+            </label>
+            <label
+              >Sampai
+              <input type="date" name="end" th:value="${end}" />
+            </label>
+            <button type="submit">Filter</button>
+          </form>
+
+          <div class="action-bar">
+            <a href="/transactions/new">+ Tambah Transaksi</a>
+            <a href="/journals">Lihat Jurnal</a>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Tipe</th>
+                <th>Jumlah</th>
+                <th>Kategori</th>
+                <th>Deskripsi</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="t : ${transactions}">
+                <td th:text="${t.date}"></td>
+                <td th:text="${t.type}"></td>
+                <td>
+                  Rp
+                  <span
+                    th:text="${#numbers.formatDecimal(t.amount, 0, 'POINT', 2, 'COMMA')}"
+                  ></span>
+                </td>
+                <td
+                  th:text="${t.category != null ? t.category.name : '-'}"
+                ></td>
+
+                <td th:text="${t.description}"></td>
+                <td>
+                  <a th:href="@{'/transactions/edit/' + ${t.id}}">Edit</a>
+                  <a
+                    th:href="@{'/transactions/confirm-delete/' + ${t.id}}"
+                    class="danger"
+                  >
+                    Hapus
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </main>
     </div>
-
-    <h1>Daftar Transaksi Kas</h1>
-
-    <form method="get" action="/transactions" class="filter-form">
-        <label>
-            Mulai
-            <input type="date" name="start" th:value="${start}">
-        </label>
-        <label>
-            Sampai
-            <input type="date" name="end" th:value="${end}">
-        </label>
-        <button type="submit">Filter</button>
-    </form>
-
-    <div class="action-bar">
-        <a href="/transactions/new">+ Tambah Transaksi</a>
-        <a href="/journals">Lihat Jurnal</a>
-    </div>
-
-    <table>
-        <thead>
-        <tr>
-            <th>Tanggal</th>
-            <th>Tipe</th>
-            <th>Jumlah</th>
-            <th>Deskripsi</th>
-            <th>Aksi</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="t : ${transactions}">
-            <td th:text="${t.date}"></td>
-            <td th:text="${t.type}"></td>
-            <td th:text="${t.amount}"></td>
-            <td th:text="${t.description}"></td>
-            <td>
-                <a th:href="@{'/transactions/edit/' + ${t.id}}">Edit</a>
-                <form th:action="@{'/transactions/delete/' + ${t.id}}"
-                      method="post" style="display:inline">
-                    <button type="submit" class="danger"
-                            onclick="return confirm('Hapus transaksi?')">
-                        Hapus
-                    </button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-</div>
-
-</body>
+  </body>
 </html>

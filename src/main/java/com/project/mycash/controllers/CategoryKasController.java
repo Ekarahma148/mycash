@@ -28,8 +28,7 @@ public class CategoryKasController {
     public String save(
             @Valid @ModelAttribute("category") CategoryKas category,
             BindingResult result,
-            Model model
-    ) {
+            Model model) {
         if (result.hasErrors()) {
             model.addAttribute("categories", categoryRepo.findAll());
             return "category";

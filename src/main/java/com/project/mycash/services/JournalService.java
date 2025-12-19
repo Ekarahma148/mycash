@@ -1,11 +1,11 @@
 package com.project.mycash.services;
+
 import org.springframework.stereotype.Service;
 import com.project.mycash.models.CashTransaction;
 import com.project.mycash.models.JournalEntry;
 import com.project.mycash.models.TransactionType;
 import com.project.mycash.repositories.JournalEntryRepository;
 import lombok.RequiredArgsConstructor;
-
 
 @Service
 @RequiredArgsConstructor
