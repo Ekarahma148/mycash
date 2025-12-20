@@ -1,17 +1,32 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <title>Login</title>
-<link rel="stylesheet" th:href="@{/css/app.css}">
-</head>
-<body>
-<h1>Login</h1>
-<form method="post" th:action="@{/login}">
-    <label>Username: <input type="text" name="username" required/></label><br/>
-    <label>Password: <input type="password" name="password" required/></label><br/>
-    <button type="submit">Login</button>
-</form>
-<p th:if="${error}" th:text="${error}"></p>
-</body>
+    <link rel="stylesheet" th:href="@{/css/app.css}" />
+  </head>
+  <body>
+    <main class="content">
+      <div class="container">
+        <h1>Login</h1>
+        <form method="post" th:action="@{/login}">
+          <input type="text" name="username" placeholder="Username" required />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+          />
+          <button type="submit">Login</button>
+        </form>
+
+        <p th:if="${error}" th:text="${error}" style="color: red"></p>
+
+        <p>
+          Belum punya akun?
+          <a th:href="@{/register}">Daftar</a>
+        </p>
+      </div>
+    </main>
+  </body>
 </html>

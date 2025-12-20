@@ -42,4 +42,9 @@ public class CashTransaction {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private CategoryKas category;
+
+    @ManyToOne
+@JoinColumn(name = "user_id")
+private User user;
+
 }

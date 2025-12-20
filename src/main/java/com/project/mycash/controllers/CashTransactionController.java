@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.project.mycash.models.CashTransaction;
 import com.project.mycash.models.TransactionType;
+import com.project.mycash.models.User;
 import com.project.mycash.repositories.CategoryKasRepository;
 import com.project.mycash.services.CashTransactionService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -32,13 +34,16 @@ public class CashTransactionController {
 
             @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate end,
 
+            HttpSession session,
             Model model) {
         if (start == null)
             start = LocalDate.now().withDayOfMonth(1);
         if (end == null)
             end = LocalDate.now();
 
-        List<CashTransaction> list = service.findByPeriod(start, end);
+        User user = (User) session.getAttribute("user");
+
+        List<CashTransaction> list = service.findByUserAndPeriod(user, start, end);
 
         model.addAttribute("transactions", list);
         model.addAttribute("start", start);
@@ -60,12 +65,16 @@ public class CashTransactionController {
     public String save(
             @Valid @ModelAttribute("transaction") CashTransaction transaction,
             BindingResult result,
+            HttpSession session,
             Model model) {
         if (result.hasErrors()) {
             model.addAttribute("types", TransactionType.values());
             model.addAttribute("categories", categoryRepo.findAll());
             return "transactions/form";
         }
+
+        User user = (User) session.getAttribute("user");
+        transaction.setUser(user); // 🔥 INI KUNCI
 
         service.save(transaction);
         return "redirect:/transactions";

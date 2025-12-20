@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" th:href="@{/css/app.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <title>Dashboard</title>
   </head>
   <body>
@@ -11,35 +15,157 @@
 
     <main class="content">
       <div class="container">
-        <h1>Dashboard</h1>
+        <!-- Dashboard Header dengan Tanggal -->
+        <div class="dashboard-header">
+          <div>
+            <h1>Dashboard Keuangan</h1>
+            <p class="text-light">Ringkasan keuangan Anda hari ini</p>
+          </div>
+          <div class="date-display" id="current-date">
+            <!-- Tanggal akan diisi oleh JavaScript -->
+          </div>
+        </div>
 
+        <!-- Statistik Cards -->
         <div class="dashboard">
-          <div class="card">
-            <h3>Kas Masuk</h3>
-            <p>
-              Rp
-              <span
-                th:text="${#numbers.formatDecimal(totalIn, 0, 'POINT', 2, 'COMMA')}"
-              ></span>
-            </p>
+          <div class="card income">
+            <div>
+              <div class="card-icon">
+                <i class="fas fa-arrow-down"></i>
+              </div>
+              <h3>Kas Masuk</h3>
+              <p class="amount">
+                Rp
+                <span
+                  th:text="${#numbers.formatDecimal(totalIn, 0, 'POINT', 2, 'COMMA')}"
+                ></span>
+              </p>
+              <div class="card-trend">
+                <i class="fas fa-chart-line trend-up"></i>
+                <span>+12% dari bulan lalu</span>
+              </div>
+            </div>
           </div>
-          <div class="card">
-            <h3>Kas Keluar</h3>
-            <p>
-              Rp
-              <span
-                th:text="${#numbers.formatDecimal(totalOut, 0, 'POINT', 2, 'COMMA')}"
-              ></span>
-            </p>
+
+          <div class="card expense">
+            <div>
+              <div class="card-icon">
+                <i class="fas fa-arrow-up"></i>
+              </div>
+              <h3>Kas Keluar</h3>
+              <p class="amount">
+                Rp
+                <span
+                  th:text="${#numbers.formatDecimal(totalOut, 0, 'POINT', 2, 'COMMA')}"
+                ></span>
+              </p>
+              <div class="card-trend">
+                <i class="fas fa-chart-line trend-down"></i>
+                <span>-5% dari bulan lalu</span>
+              </div>
+            </div>
           </div>
-          <div class="card">
-            <h3>Saldo</h3>
-            <p>
-              Rp
-              <span
-                th:text="${#numbers.formatDecimal(balance, 0, 'POINT', 2, 'COMMA')}"
-              ></span>
-            </p>
+
+          <div class="card balance">
+            <div>
+              <div class="card-icon">
+                <i class="fas fa-wallet"></i>
+              </div>
+              <h3>Saldo</h3>
+              <p class="amount">
+                Rp
+                <span
+                  th:text="${#numbers.formatDecimal(balance, 0, 'POINT', 2, 'COMMA')}"
+                ></span>
+              </p>
+              <div class="card-trend">
+                <i class="fas fa-check-circle"></i>
+                <span>Sehat</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="charts-section">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Statistik Bulan Ini</h3>
+              <div class="chart-legend">
+                <div class="legend-item">
+                  <div class="legend-color income"></div>
+                  <span>Pemasukan</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color expense"></div>
+                  <span>Pengeluaran</span>
+                </div>
+              </div>
+            </div>
+            <div class="chart-placeholder">
+              <i
+                class="fas fa-chart-bar"
+                style="font-size: 3rem; margin-right: 1rem"
+              ></i>
+              <div>
+                <h4>Grafik Statistik</h4>
+                <p>Visualisasi data akan tampil di sini</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Kategori Pengeluaran</h3>
+            </div>
+            <div class="chart-placeholder">
+              <i
+                class="fas fa-chart-pie"
+                style="font-size: 3rem; margin-right: 1rem"
+              ></i>
+              <div>
+                <h4>Pie Chart</h4>
+                <p>Distribusi pengeluaran per kategori</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="recent-activity">
+          <div class="activity-header">
+            <h3>Aktivitas Terbaru</h3>
+            <a href="/transactions" class="btn btn-outline">Lihat Semua</a>
+          </div>
+          <div class="activity-list">
+            <!-- Contoh aktivitas (bisa dinamis dari backend) -->
+            <div class="activity-item">
+              <div class="activity-icon income">
+                <i class="fas fa-money-bill-wave"></i>
+              </div>
+              <div class="activity-details">
+                <div class="activity-title">Pembayaran Proyek</div>
+                <div class="activity-description">Dari PT. ABC Digital</div>
+              </div>
+              <div class="activity-amount">+ Rp 2.500.000</div>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-icon expense">
+                <i class="fas fa-shopping-cart"></i>
+              </div>
+              <div class="activity-details">
+                <div class="activity-title">Belanja Bulanan</div>
+                <div class="activity-description">Supermarket Indomaret</div>
+              </div>
+              <div class="activity-amount">- Rp 350.000</div>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-icon income">
+                <i class="fas fa-gift"></i>
+              </div>
+            </div>
           </div>
         </div>
       </div>

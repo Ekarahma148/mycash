@@ -6,70 +6,66 @@
     <link rel="stylesheet" th:href="@{/css/app.css}" />
   </head>
   <body>
-    <div class="layout">
-      <div th:replace="fragments/sidebar :: sidebar"></div>
+    <div th:replace="fragments/sidebar :: sidebar"></div>
 
-      <main class="content">
-        <div class="container">
-          <h1>Daftar Transaksi Kas</h1>
+    <main class="content">
+      <div class="container">
+        <h1>Daftar Transaksi Kas</h1>
 
-          <form method="get" action="/transactions" class="filter-form">
-            <label
-              >Mulai
-              <input type="date" name="start" th:value="${start}" />
-            </label>
-            <label
-              >Sampai
-              <input type="date" name="end" th:value="${end}" />
-            </label>
-            <button type="submit">Filter</button>
-          </form>
+        <form method="get" action="/transactions" class="filter-form">
+          <label
+            >Mulai
+            <input type="date" name="start" th:value="${start}" />
+          </label>
+          <label
+            >Sampai
+            <input type="date" name="end" th:value="${end}" />
+          </label>
+          <button type="submit">Filter</button>
+        </form>
 
-          <div class="action-bar">
-            <a href="/transactions/new">+ Tambah Transaksi</a>
-            <a href="/journals">Lihat Jurnal</a>
-          </div>
-
-          <table>
-            <thead>
-              <tr>
-                <th>Tanggal</th>
-                <th>Tipe</th>
-                <th>Jumlah</th>
-                <th>Kategori</th>
-                <th>Deskripsi</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:each="t : ${transactions}">
-                <td th:text="${t.date}"></td>
-                <td th:text="${t.type}"></td>
-                <td>
-                  Rp
-                  <span
-                    th:text="${#numbers.formatDecimal(t.amount, 0, 'POINT', 2, 'COMMA')}"
-                  ></span>
-                </td>
-                <td
-                  th:text="${t.category != null ? t.category.name : '-'}"
-                ></td>
-
-                <td th:text="${t.description}"></td>
-                <td>
-                  <a th:href="@{'/transactions/edit/' + ${t.id}}">Edit</a>
-                  <a
-                    th:href="@{'/transactions/confirm-delete/' + ${t.id}}"
-                    class="danger"
-                  >
-                    Hapus
-                  </a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="action-bar">
+          <a href="/transactions/new">+ Tambah Transaksi</a>
+          <a href="/journals">Lihat Jurnal</a>
         </div>
-      </main>
-    </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Tipe</th>
+              <th>Jumlah</th>
+              <th>Kategori</th>
+              <th>Deskripsi</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="t : ${transactions}">
+              <td th:text="${t.date}"></td>
+              <td th:text="${t.type}"></td>
+              <td>
+                Rp
+                <span
+                  th:text="${#numbers.formatDecimal(t.amount, 0, 'POINT', 2, 'COMMA')}"
+                ></span>
+              </td>
+              <td th:text="${t.category != null ? t.category.name : '-'}"></td>
+
+              <td th:text="${t.description}"></td>
+              <td>
+                <a th:href="@{'/transactions/edit/' + ${t.id}}">Edit</a>
+                <a
+                  th:href="@{'/transactions/confirm-delete/' + ${t.id}}"
+                  class="danger"
+                >
+                  Hapus
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
   </body>
 </html>

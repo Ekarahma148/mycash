@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>History Aktivitas</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}" />
+  </head>
+  <body>
+    <div th:replace="fragments/sidebar :: sidebar"></div>
+
+    <main class="content">
+      <div class="container">
+        <h1>History Aktivitas</h1>
+
+        <!-- SEARCH -->
+        <form method="get" th:action="@{/history}">
+          <input
+            type="text"
+            name="keyword"
+            placeholder="Cari aktivitas..."
+            th:value="${keyword}"
+          />
+          <button type="submit">Cari</button>
+          <a th:href="@{/history}">Reset</a>
+        </form>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Waktu</th>
+              <th>Aksi</th>
+              <th>Keterangan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="log : ${logs}">
+              <td th:text="${log.createdAt}"></td>
+              <td th:text="${log.action}"></td>
+              <td th:text="${log.description}"></td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(logs)}">
+              <td colspan="3">Tidak ada data</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </body>
+</html>

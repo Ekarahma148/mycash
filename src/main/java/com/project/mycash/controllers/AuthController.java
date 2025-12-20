@@ -1,21 +1,24 @@
 package com.project.mycash.controllers;
 
-import jakarta.servlet.http.HttpSession;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import com.project.mycash.models.User;
 import com.project.mycash.services.AuthService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
+
+    // 🔥 FIRST RUN → LOGIN
+    @GetMapping("/")
+    public String root() {
+        return "redirect:/login";
+    }
 
     @GetMapping("/register")
     public String registerForm(Model model) {
@@ -24,22 +27,46 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String doRegister(
-            @ModelAttribute User user,
-            Model model) {
+    public String doRegister(@ModelAttribute User user, Model model) {
 
-        // VALIDASI MANUAL
-        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+        // USERNAME
+        if (user.getUsername() == null || user.getUsername().isBlank()) {
             model.addAttribute("error", "Username wajib diisi");
             return "register";
         }
 
-        if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+        // PASSWORD
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
             model.addAttribute("error", "Password wajib diisi");
             return "register";
         }
 
-        // CEK USERNAME SUDAH ADA
+        if (user.getPassword().length() > 6) {
+            model.addAttribute("error", "Password maksimal 6 karakter");
+            return "register";
+        }
+
+        // ✅ VALIDASI NAMA LENGKAP
+        String fullName = user.getFullName();
+
+        if (fullName == null || fullName.isBlank()) {
+            model.addAttribute("error", "Nama lengkap wajib diisi");
+            return "register";
+        }
+
+        // hanya huruf & spasi
+        if (!fullName.matches("[A-Za-z ]+")) {
+            model.addAttribute("error", "Nama lengkap hanya boleh huruf");
+            return "register";
+        }
+
+        // minimal 2 huruf (tanpa spasi)
+        if (fullName.replace(" ", "").length() < 2) {
+            model.addAttribute("error", "Nama lengkap minimal 2 huruf");
+            return "register";
+        }
+
+        // CEK USERNAME
         if (authService.existsByUsername(user.getUsername())) {
             model.addAttribute("error", "Username sudah digunakan");
             return "register";
@@ -61,25 +88,13 @@ public class AuthController {
             HttpSession session,
             Model model) {
 
-        // ✅ VALIDASI FORM
-        if (username == null || username.trim().isEmpty()) {
-            model.addAttribute("error", "Username tidak boleh kosong");
+        User user = authService.login(username, password);
+        if (user == null) {
+            model.addAttribute("error", "Username atau password salah");
             return "login";
         }
 
-        if (password == null || password.trim().isEmpty()) {
-            model.addAttribute("error", "Password tidak boleh kosong");
-            return "login";
-        }
-
-        User u = authService.login(username, password);
-
-        if (u == null) {
-            model.addAttribute("error", "Login gagal: username atau password salah");
-            return "login";
-        }
-
-        session.setAttribute("user", u);
+        session.setAttribute("user", user);
         return "redirect:/dashboard";
     }
 
@@ -88,5 +103,4 @@ public class AuthController {
         session.invalidate();
         return "redirect:/login";
     }
-
 }

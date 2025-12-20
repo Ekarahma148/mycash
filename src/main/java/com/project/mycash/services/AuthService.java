@@ -1,7 +1,12 @@
 package com.project.mycash.services;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
+
+import com.project.mycash.models.CashTransaction;
 import com.project.mycash.models.User;
 import com.project.mycash.repositories.UserRepository;
 
@@ -25,4 +30,5 @@ public class AuthService {
         }
         return null;
     }
+
 }

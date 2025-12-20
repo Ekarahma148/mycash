@@ -6,31 +6,41 @@
 <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
+<main class="content>
+    <div class="container">
 
-<h1>Register</h1>
-
-<form method="post" th:action="@{/register}" th:object="${user}">
-    <label>
-        Username:
-        <input type="text" th:field="*{username}" required>
-    </label>
-
-    <label>
-        Password:
-        <input type="password" th:field="*{password}" required>
-    </label>
-
-    <label>
-        Nama Lengkap:
-        <input type="text" th:field="*{fullName}">
-    </label>
-
-    <button type="submit">Register</button>
-</form>
-
-<p th:if="${error}" style="color:red" th:text="${error}"></p>
-
-<p>Sudah punya akun? <a th:href="@{/login}">Login</a></p>
+        <h1>Register</h1>
+        
+        <form method="post" th:action="@{/register}" th:object="${user}">
+            <label>
+                Username:
+                <input type="text" th:field="*{username}" placeholder="Masukkan Username"
+        required>
+            </label>
+        
+            <label>
+                Password:
+        <input type="password"
+               th:field="*{password}"
+               maxlength="6"
+               placeholder="Password (maks 6 karakter)"
+               required>
+            </label>
+        
+            <label>
+                Nama Lengkap:
+                <input type="text" th:field="*{fullName}" pattern="[A-Za-z ]{2,}"placeholder="Masukkan Nama Lengkap"
+        required>
+            </label>
+        
+            <button type="submit">Register</button>
+        </form>
+        
+        <p th:if="${error}" style="color:red" th:text="${error}"></p>
+        
+        <p>Sudah punya akun? <a th:href="@{/login}">Login</a></p>
+    </div>
+</main>
 
 </body>
 </html>

@@ -1,50 +1,49 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Kategori Kas</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
-</head>
-<body>
-
-<div class="layout">
-
+    <link rel="stylesheet" th:href="@{/css/app.css}" />
+  </head>
+  <body>
     <div th:replace="fragments/sidebar :: sidebar"></div>
 
     <main class="content">
-        <div class="container">
+      <div class="container">
+        <h1>Manajemen Kategori</h1>
 
-            <h1>Manajemen Kategori</h1>
+        <form th:action="@{/categories}" th:object="${category}" method="post">
+          <label
+            >Nama Kategori
+            <input type="text" th:field="*{name}" />
+          </label>
 
-            <form th:action="@{/categories}" th:object="${category}" method="post">
-                <label>Nama Kategori
-                    <input type="text" th:field="*{name}">
-                </label>
+          <p
+            class="error"
+            th:if="${#fields.hasErrors('name')}"
+            th:errors="*{name}"
+          ></p>
 
-                <p class="error" th:if="${#fields.hasErrors('name')}"
-                   th:errors="*{name}"></p>
+          <button type="submit">Simpan</button>
+        </form>
 
-                <button type="submit">Simpan</button>
-            </form>
+        <hr />
 
-            <hr>
-
-            <table>
-                <thead>
-                <tr><th>ID</th><th>Nama</th></tr>
-                </thead>
-                <tbody>
-                <tr th:each="c : ${categories}">
-                    <td th:text="${c.id}"></td>
-                    <td th:text="${c.name}"></td>
-                </tr>
-                </tbody>
-            </table>
-
-        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nama</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="c : ${categories}">
+              <td th:text="${c.id}"></td>
+              <td th:text="${c.name}"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </main>
-
-</div>
-
-</body>
+  </body>
 </html>
