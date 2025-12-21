@@ -18,37 +18,36 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DashboardController {
 
-        private final CashTransactionRepository txRepo;
+    private final CashTransactionRepository txRepo;
 
-        @GetMapping("/dashboard")
-        public String dashboard(Model model, HttpSession session) {
+    @GetMapping({"/", "/dashboard"})
+    public String dashboard(Model model, HttpSession session) {
 
-                User user = (User) session.getAttribute("user");
-                if (user == null)
-                        return "redirect:/login";
+        User user = (User) session.getAttribute("user");
+        if (user == null) return "redirect:/login";
 
-                List<CashTransaction> transactions = txRepo.findByUser(user);
+        List<CashTransaction> tx = txRepo.findByUser(user);
 
-                BigDecimal totalIn = transactions.stream()
-                                .filter(t -> t.getType() == TransactionType.IN)
-                                .map(CashTransaction::getAmount)
-                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalIn = tx.stream()
+                .filter(t -> t.getType() == TransactionType.IN)
+                .map(CashTransaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                BigDecimal totalOut = transactions.stream()
-                                .filter(t -> t.getType() == TransactionType.OUT)
-                                .map(CashTransaction::getAmount)
-                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalOut = tx.stream()
+                .filter(t -> t.getType() == TransactionType.OUT)
+                .map(CashTransaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                model.addAttribute("totalIn", totalIn);
-                model.addAttribute("totalOut", totalOut);
-                model.addAttribute("balance", totalIn.subtract(totalOut));
+        List<CashTransaction> recentTx = tx.stream()
+                .sorted(Comparator.comparing(CashTransaction::getDate).reversed())
+                .limit(5)
+                .toList();
 
-                model.addAttribute("recent",
-                                transactions.stream()
-                                                .sorted(Comparator.comparing(CashTransaction::getDate).reversed())
-                                                .limit(10)
-                                                .toList());
+        model.addAttribute("totalIn", totalIn);
+        model.addAttribute("totalOut", totalOut);
+        model.addAttribute("balance", totalIn.subtract(totalOut));
+        model.addAttribute("transactions", recentTx);
 
-                return "index";
-        }
+        return "index";
+    }
 }

@@ -1,77 +1,129 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Form Transaksi</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}" />
-  </head>
-  <body>
-    
-      <!-- SIDEBAR -->
-      <div th:replace="fragments/sidebar :: sidebar"></div>
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${transaction.id == null ? 'Tambah' : 'Edit'} + ' Transaksi - MoneyTracker'">Form Transaksi</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
 
-      <!-- CONTENT -->
-      <main class="content">
-        <div class="container">
-          <h1
-            th:text="${transaction.id} == null ? 'Tambah Transaksi' : 'Edit Transaksi'"
-          ></h1>
+<!-- SIDEBAR -->
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-          <form
-            th:action="@{/transactions}"
-            th:object="${transaction}"
-            method="post"
-          >
-            <input type="hidden" th:field="*{id}" />
+<!-- CONTENT -->
+<main class="content">
+    <div class="container">
 
-            <label
-              >Tanggal
-              <input type="date" th:field="*{date}" />
-            </label>
-
-            <label
-              >Tipe
-              <select th:field="*{type}">
-                <option
-                  th:each="t : ${types}"
-                  th:value="${t}"
-                  th:text="${t}"
-                ></option>
-              </select>
-            </label>
-
-            <label
-              >Jumlah
-              <input type="number" step="0.01" min="0" th:field="*{amount}" />
-              <span
-                class="error"
-                th:if="${#fields.hasErrors('amount')}"
-                th:errors="*{amount}"
-              >
-              </span>
-            </label>
-
-            <label
-              >Deskripsi
-              <textarea th:field="*{description}"></textarea>
-            </label>
-
-            <label
-              >Kategori
-              <select th:field="*{category}">
-                <option value="">-- Pilih --</option>
-                <option
-                  th:each="c : ${categories}"
-                  th:value="${c.id}"
-                  th:text="${c.name}"
-                ></option>
-              </select>
-            </label>
-
-            <button type="submit">Simpan</button>
-            <a href="/transactions">Batal</a>
-          </form>
+        <!-- Judul Form -->
+        <div class="dashboard-header mb-6">
+            <h1 style="font-size: 1.9rem; margin-bottom: 0.5rem;"
+                th:text="${transaction.id == null ? 'Tambah Transaksi Baru' : 'Edit Transaksi'}">
+                Tambah Transaksi
+            </h1>
+            <p style="color: var(--text-light);">
+                Isi detail transaksi dengan lengkap
+            </p>
         </div>
-      </main>
-  </body>
+
+        <!-- Form Transaksi -->
+        <div class="auth-card" style="max-width: 700px; margin: 0 auto; padding: 2.5rem;">
+            <form th:action="@{/transactions/new}" 
+                  th:object="${transaction}" 
+                  method="post"
+                  class="flex flex-col gap-5">
+
+                <input type="hidden" th:field="*{id}" />
+
+                <!-- Tanggal -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-calendar-alt mr-2" style="color: var(--navy-primary);"></i>
+                        Tanggal Transaksi
+                    </label>
+                    <input type="date" 
+                           th:field="*{date}" 
+                           class="form-control" 
+                           required/>
+                </div>
+
+                <!-- Tipe -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-exchange-alt mr-2" style="color: var(--navy-primary);"></i>
+                        Tipe Transaksi
+                    </label>
+                    <select th:field="*{type}" class="form-control" required>
+                        <option th:each="t : ${types}"
+                                th:value="${t}"
+                                th:text="${t == 'IN' ? 'Pemasukan' : 'Pengeluaran'}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Jumlah -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-money-bill-wave mr-2" style="color: var(--navy-primary);"></i>
+                        Jumlah (Rp)
+                    </label>
+                    <input type="number" 
+                           step="1000" 
+                           min="0" 
+                           placeholder="Contoh: 500000"
+                           th:field="*{amount}" 
+                           class="form-control" 
+                           required/>
+                    <span class="text-danger text-sm mt-1 block"
+                          th:if="${#fields.hasErrors('amount')}"
+                          th:errors="*{amount}">
+                    </span>
+                </div>
+
+                <!-- Deskripsi -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa keterangan mr-2" style="color: var(--navy-primary);"></i>
+                        Deskripsi
+                    </label>
+                    <textarea th:field="*{description}" 
+                              class="form-control" 
+                              rows="3" 
+                              placeholder="Jelaskan transaksi ini (opsional)"></textarea>
+                </div>
+
+                <!-- Kategori -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-tag mr-2" style="color: var(--navy-primary);"></i>
+                        Kategori
+                    </label>
+                    <select th:field="*{category}" class="form-control">
+                        <option value="">-- Tidak ada kategori --</option>
+                        <option th:each="c : ${categories}"
+                                th:value="${c.id}"
+                                th:text="${c.name}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Tombol Aksi -->
+                <div class="flex gap-3 mt-6">
+                    <button type="submit" class="btn btn-primary flex-1">
+                        <i class="fas fa-save mr-2"></i>
+                        Simpan Transaksi
+                    </button>
+                    <a th:href="@{/transactions}" class="btn btn-outline flex-1 text-center">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Batal
+                    </a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</main>
+
+</body>
 </html>

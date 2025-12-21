@@ -1,71 +1,115 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Transaksi Kas</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}" />
-  </head>
-  <body>
-    <div th:replace="fragments/sidebar :: sidebar"></div>
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Daftar Transaksi Kas - MoneyTracker</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
 
-    <main class="content">
-      <div class="container">
-        <h1>Daftar Transaksi Kas</h1>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-        <form method="get" action="/transactions" class="filter-form">
-          <label
-            >Mulai
-            <input type="date" name="start" th:value="${start}" />
-          </label>
-          <label
-            >Sampai
-            <input type="date" name="end" th:value="${end}" />
-          </label>
-          <button type="submit">Filter</button>
-        </form>
+<main class="content">
+    <div class="container">
 
-        <div class="action-bar">
-          <a href="/transactions/new">+ Tambah Transaksi</a>
-          <a href="/journals">Lihat Jurnal</a>
+        <!-- Judul Halaman - Lebih Kecil & Rapi -->
+        <div class="dashboard-header mb-4">
+            <h1 style="font-size: 1.8rem;">Daftar Transaksi Kas</h1>
+            <p style="color: var(--text-light); font-size: 0.95rem; margin-top: 0.4rem;">
+                Kelola pemasukan dan pengeluaran Anda
+            </p>
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Tanggal</th>
-              <th>Tipe</th>
-              <th>Jumlah</th>
-              <th>Kategori</th>
-              <th>Deskripsi</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="t : ${transactions}">
-              <td th:text="${t.date}"></td>
-              <td th:text="${t.type}"></td>
-              <td>
-                Rp
-                <span
-                  th:text="${#numbers.formatDecimal(t.amount, 0, 'POINT', 2, 'COMMA')}"
-                ></span>
-              </td>
-              <td th:text="${t.category != null ? t.category.name : '-'}"></td>
+        <!-- Form Filter - Compact -->
+        <div class="search-container p-3 mb-4">
+            <form method="get" action="/transactions" class="search-form gap-2">
+                <div class="form-group">
+                    <label class="form-label text-sm">Mulai</label>
+                    <input type="date" name="start" th:value="${start}" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-label text-sm">Sampai</label>
+                    <input type="date" name="end" th:value="${end}" class="form-control"/>
+                </div>
+                <div class="form-group" style="align-self: end;">
+                    <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.25rem; font-size: 0.9rem;">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
 
-              <td th:text="${t.description}"></td>
-              <td>
-                <a th:href="@{'/transactions/edit/' + ${t.id}}">Edit</a>
-                <a
-                  th:href="@{'/transactions/confirm-delete/' + ${t.id}}"
-                  class="danger"
-                >
-                  Hapus
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </main>
-  </body>
+        <!-- Action Bar - Tombol Lebih Kecil -->
+        <div class="flex justify-end mb-4 gap-2">
+            <a th:href="@{/transactions/new}" class="btn btn-success" style="padding: 0.65rem 1rem; font-size: 0.9rem;">
+                <i class="fas fa-plus"></i> Tambah
+            </a>
+            <a th:href="@{/journals}" class="btn btn-outline" style="padding: 0.65rem 1rem; font-size: 0.9rem;">
+                <i class="fas fa-book"></i> Jurnal
+            </a>
+        </div>
+
+        <!-- Tabel Transaksi - Baris Lebih Rapat & Font Kecil -->
+        <div class="table-container">
+            <table style="font-size: 0.92rem;">
+                <thead>
+                    <tr>
+                        <th style="padding: 0.9rem 1rem;">Tanggal</th>
+                        <th style="padding: 0.9rem 1rem;">Tipe</th>
+                        <th style="padding: 0.9rem 1rem;">Jumlah</th>
+                        <th style="padding: 0.9rem 1rem;">Kategori</th>
+                        <th style="padding: 0.9rem 1rem;">Deskripsi</th>
+                        <th class="text-center" style="padding: 0.9rem 1rem;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="t : ${transactions}">
+                        <td th:text="${#temporals.format(t.date, 'dd MMM yyyy')}">
+                            01 Jan 2025
+                        </td>
+                        <td>
+                            <span th:class="${t.type.name() == 'IN'} ? 'text-success font-medium' : 'text-danger font-medium'"
+                                  th:text="${t.type.name() == 'IN' ? 'Masuk' : 'Keluar'}">
+                                Tipe
+                            </span>
+                        </td>
+                        <td>
+                            <span th:class="${t.type.name() == 'IN'} ? 'text-success font-medium' : 'text-danger font-medium'"
+                                  th:text="${t.type.name() == 'IN' ? '+ Rp ' : '- Rp '} + ${#numbers.formatCurrency(t.amount)}">
+                                Rp 0
+                            </span>
+                        </td>
+                        <td th:text="${t.category != null ? t.category.name : '-'}">-</td>
+                        <td th:text="${t.description ?: '-'}">-</td>
+                        <td class="table-actions text-center">
+                            <a th:href="@{'/transactions/edit/' + ${t.id}}"
+                               class="btn btn-warning" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a th:href="@{'/transactions/confirm-delete/' + ${t.id}}"
+                               class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;"
+                               onclick="return confirm('Yakin hapus transaksi ini?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- Jika tidak ada transaksi -->
+                    <tr th:if="${#lists.isEmpty(transactions)}">
+                        <td colspan="6" class="text-center py-6" style="color: var(--text-light); font-size: 0.95rem;">
+                            <i class="fas fa-inbox text-4xl mb-3 block" style="opacity: 0.5;"></i>
+                            <div>Belum ada transaksi</div>
+                            <div class="text-sm mt-1">Mulai dengan menambah transaksi baru</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</main>
+
+</body>
 </html>

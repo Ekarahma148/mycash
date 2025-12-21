@@ -1,174 +1,195 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" th:href="@{/css/app.css}" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <title>Dashboard</title>
-  </head>
-  <body>
-    <div th:replace="fragments/sidebar :: sidebar"></div>
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Dashboard - MoneyTracker</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
 
-    <main class="content">
-      <div class="container">
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<main class="content">
+    <div class="container">
+
         <!-- Dashboard Header dengan Tanggal -->
         <div class="dashboard-header">
-          <div>
-            <h1>Dashboard Keuangan</h1>
-            <p class="text-light">Ringkasan keuangan Anda hari ini</p>
-          </div>
-          <div class="date-display" id="current-date">
-            <!-- Tanggal akan diisi oleh JavaScript -->
-          </div>
+            <div>
+                <h1>Dashboard Keuangan</h1>
+                <p style="color: var(--text-light); margin-top: 0.5rem;">
+                    
+                </p>
+            </div>
+            <div class="date-display" id="current-date">
+                Loading...
+            </div>
         </div>
 
         <!-- Statistik Cards -->
         <div class="dashboard">
-          <div class="card income">
-            <div>
-              <div class="card-icon">
-                <i class="fas fa-arrow-down"></i>
-              </div>
-              <h3>Kas Masuk</h3>
-              <p class="amount">
-                Rp
-                <span
-                  th:text="${#numbers.formatDecimal(totalIn, 0, 'POINT', 2, 'COMMA')}"
-                ></span>
-              </p>
-              <div class="card-trend">
-                <i class="fas fa-chart-line trend-up"></i>
-                <span>+12% dari bulan lalu</span>
-              </div>
+            <div class="card income">
+                <div>
+                    <div class="card-icon">
+                        <i class="fas fa-arrow-trend-up"></i>
+                    </div>
+                    <h3>Pemasukan</h3>
+                    <p class="amount">
+                        Rp <span th:text="${#numbers.formatCurrency(totalIn ?: 0)}">0</span>
+                    </p>
+                    <div class="card-trend trend-up">
+                        <i class="fas fa-caret-up"></i>
+                        <span>+12% dari bulan lalu</span>
+                    </div>
+                </div>
             </div>
-          </div>
 
-          <div class="card expense">
-            <div>
-              <div class="card-icon">
-                <i class="fas fa-arrow-up"></i>
-              </div>
-              <h3>Kas Keluar</h3>
-              <p class="amount">
-                Rp
-                <span
-                  th:text="${#numbers.formatDecimal(totalOut, 0, 'POINT', 2, 'COMMA')}"
-                ></span>
-              </p>
-              <div class="card-trend">
-                <i class="fas fa-chart-line trend-down"></i>
-                <span>-5% dari bulan lalu</span>
-              </div>
+            <div class="card expense">
+                <div>
+                    <div class="card-icon">
+                        <i class="fas fa-arrow-trend-down"></i>
+                    </div>
+                    <h3>Pengeluaran</h3>
+                    <p class="amount">
+                        Rp <span th:text="${#numbers.formatCurrency(totalOut ?: 0)}">0</span>
+                    </p>
+                    <div class="card-trend trend-down">
+                        <i class="fas fa-caret-down"></i>
+                        <span>-5% dari bulan lalu</span>
+                    </div>
+                </div>
             </div>
-          </div>
 
-          <div class="card balance">
-            <div>
-              <div class="card-icon">
-                <i class="fas fa-wallet"></i>
-              </div>
-              <h3>Saldo</h3>
-              <p class="amount">
-                Rp
-                <span
-                  th:text="${#numbers.formatDecimal(balance, 0, 'POINT', 2, 'COMMA')}"
-                ></span>
-              </p>
-              <div class="card-trend">
-                <i class="fas fa-check-circle"></i>
-                <span>Sehat</span>
-              </div>
+            <div class="card balance">
+                <div>
+                    <div class="card-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <h3>Saldo Saat Ini</h3>
+                    <p class="amount">
+                        Rp <span th:text="${#numbers.formatCurrency(balance ?: 0)}">0</span>
+                    </p>
+                    <div class="card-trend"
+                         th:classappend="${balance >= 0 ? 'trend-up' : 'trend-down'}">
+                        <i th:class="${balance >= 0 ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle'}"></i>
+                        <span th:text="${balance >= 0 ? 'Keuangan Sehat' : 'Perlu Perhatian'}">
+                            Sehat
+                        </span>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
 
         <!-- Chart Section -->
         <div class="charts-section">
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3>Statistik Bulan Ini</h3>
-              <div class="chart-legend">
-                <div class="legend-item">
-                  <div class="legend-color income"></div>
-                  <span>Pemasukan</span>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Statistik Bulan Ini</h3>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-color income"></div>
+                            <span>Pemasukan</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color expense"></div>
+                            <span>Pengeluaran</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="legend-item">
-                  <div class="legend-color expense"></div>
-                  <span>Pengeluaran</span>
+                <div class="chart-placeholder flex items-center">
+                    <i class="fas fa-chart-line" style="font-size: 3.5rem; opacity: 0.8; margin-right: 1.5rem;"></i>
+                    <div>
+                        <h4>Grafik Bulanan</h4>
+                        <p style="color: var(--text-light);">Trend pemasukan vs pengeluaran bulan ini</p>
+                    </div>
                 </div>
-              </div>
             </div>
-            <div class="chart-placeholder">
-              <i
-                class="fas fa-chart-bar"
-                style="font-size: 3rem; margin-right: 1rem"
-              ></i>
-              <div>
-                <h4>Grafik Statistik</h4>
-                <p>Visualisasi data akan tampil di sini</p>
-              </div>
-            </div>
-          </div>
 
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3>Kategori Pengeluaran</h3>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Kategori Pengeluaran</h3>
+                </div>
+                <div class="chart-placeholder flex items-center">
+                    <i class="fas fa-chart-pie" style="font-size: 3.5rem; opacity: 0.8; margin-right: 1.5rem;"></i>
+                    <div>
+                        <h4>Distribusi Kategori</h4>
+                        <p style="color: var(--text-light);">Persentase pengeluaran per kategori</p>
+                    </div>
+                </div>
             </div>
-            <div class="chart-placeholder">
-              <i
-                class="fas fa-chart-pie"
-                style="font-size: 3rem; margin-right: 1rem"
-              ></i>
-              <div>
-                <h4>Pie Chart</h4>
-                <p>Distribusi pengeluaran per kategori</p>
-              </div>
-            </div>
-          </div>
         </div>
 
-        <!-- Recent Activity -->
-        <div class="recent-activity">
-          <div class="activity-header">
-            <h3>Aktivitas Terbaru</h3>
-            <a href="/transactions" class="btn btn-outline">Lihat Semua</a>
-          </div>
-          <div class="activity-list">
-            <!-- Contoh aktivitas (bisa dinamis dari backend) -->
-            <div class="activity-item">
-              <div class="activity-icon income">
-                <i class="fas fa-money-bill-wave"></i>
-              </div>
-              <div class="activity-details">
-                <div class="activity-title">Pembayaran Proyek</div>
-                <div class="activity-description">Dari PT. ABC Digital</div>
-              </div>
-              <div class="activity-amount">+ Rp 2.500.000</div>
-            </div>
+        <!-- Recent Activity - Sekarang Pakai Data Nyata -->
+<div class="recent-activity">
+    <div class="activity-header">
+        <h3>Aktivitas Terbaru</h3>
+        <a th:href="@{/transactions}" class="btn btn-outline">
+            <i class="fas fa-list mr-2"></i>Lihat Semua
+        </a>
+    </div>
 
-            <div class="activity-item">
-              <div class="activity-icon expense">
-                <i class="fas fa-shopping-cart"></i>
-              </div>
-              <div class="activity-details">
-                <div class="activity-title">Belanja Bulanan</div>
-                <div class="activity-description">Supermarket Indomaret</div>
-              </div>
-              <div class="activity-amount">- Rp 350.000</div>
-            </div>
+    <div class="activity-list">
 
-            <div class="activity-item">
-              <div class="activity-icon income">
-                <i class="fas fa-gift"></i>
-              </div>
+        <!-- ADA TRANSAKSI -->
+        <div th:if="${transactions != null and !#lists.isEmpty(transactions)}">
+            <div th:each="t : ${transactions}" class="activity-item">
+
+                <!-- ICON -->
+                <div class="activity-icon"
+                     th:classappend="${t.type.name() == 'IN'} ? 'income' : 'expense'">
+                    <i th:class="${t.type.name() == 'IN'}
+                        ? 'fas fa-money-bill-transfer'
+                        : 'fas fa-bag-shopping'"></i>
+                </div>
+
+                <!-- DETAIL -->
+                <div class="activity-details">
+                    <div class="activity-title"
+                         th:text="${t.description ?: 'Transaksi'}">
+                        Transaksi
+                    </div>
+                    <div class="activity-description"
+                         th:text="${t.category != null ? t.category.name : 'Umum'}">
+                        Umum
+                    </div>
+                </div>
+
+                <!-- NOMINAL -->
+                <div class="activity-amount"
+                     th:classappend="${t.type.name() == 'OUT'} ? 'text-danger' : ''"
+                     th:text="${t.type.name() == 'IN'
+                        ? '+ Rp ' : '- Rp '} + ${#numbers.formatDecimal(t.amount, 0, 'COMMA', 0, 'POINT')}">
+                    Rp 0
+                </div>
+
             </div>
-          </div>
         </div>
-      </div>
-    </main>
-  </body>
+
+        <!-- BELUM ADA TRANSAKSI -->
+        <div class="activity-item text-center py-8"
+             th:unless="${transactions != null and !#lists.isEmpty(transactions)}">
+            <i class="fas fa-inbox text-5xl mb-4" style="opacity:0.5"></i>
+            <div class="activity-title">Belum ada transaksi</div>
+            <div class="activity-description">Silakan tambah transaksi pertama</div>
+        </div>
+
+    </div>
+</div>
+    </div>
+</div>
+
+    </div>
+</main>
+
+<!-- Script Tanggal Indonesia -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const today = new Date().toLocaleDateString('id-ID', options);
+        document.getElementById('current-date').textContent = today;
+    });
+</script>
+
+</body>
 </html>

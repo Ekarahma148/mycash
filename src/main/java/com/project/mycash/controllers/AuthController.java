@@ -22,7 +22,10 @@ public class AuthController {
 
     @GetMapping("/register")
     public String registerForm(Model model) {
-        model.addAttribute("user", new User());
+        // Tambah pengecekan agar tidak null saat form dibuka ulang karena error
+        if (!model.containsAttribute("user")) {
+            model.addAttribute("user", new User());
+        }
         return "register";
     }
 
@@ -30,50 +33,64 @@ public class AuthController {
     public String doRegister(@ModelAttribute User user, Model model) {
 
         // USERNAME
-        if (user.getUsername() == null || user.getUsername().isBlank()) {
+        if (user.getUsername() == null || user.getUsername().trim().isBlank()) {
             model.addAttribute("error", "Username wajib diisi");
+            model.addAttribute("user", user); // penting agar input tetap terisi saat error
             return "register";
         }
+
+        // Trim username agar tidak ada spasi di awal/akhir
+        user.setUsername(user.getUsername().trim());
 
         // PASSWORD
         if (user.getPassword() == null || user.getPassword().isBlank()) {
             model.addAttribute("error", "Password wajib diisi");
+            model.addAttribute("user", user);
             return "register";
         }
 
         if (user.getPassword().length() > 6) {
             model.addAttribute("error", "Password maksimal 6 karakter");
+            model.addAttribute("user", user);
             return "register";
         }
 
         // ✅ VALIDASI NAMA LENGKAP
         String fullName = user.getFullName();
 
-        if (fullName == null || fullName.isBlank()) {
+        if (fullName == null || fullName.trim().isBlank()) {
             model.addAttribute("error", "Nama lengkap wajib diisi");
+            model.addAttribute("user", user);
             return "register";
         }
 
+        fullName = fullName.trim();
+        user.setFullName(fullName); // simpan yang sudah di-trim
+
         // hanya huruf & spasi
         if (!fullName.matches("[A-Za-z ]+")) {
-            model.addAttribute("error", "Nama lengkap hanya boleh huruf");
+            model.addAttribute("error", "Nama lengkap hanya boleh huruf dan spasi");
+            model.addAttribute("user", user);
             return "register";
         }
 
         // minimal 2 huruf (tanpa spasi)
         if (fullName.replace(" ", "").length() < 2) {
             model.addAttribute("error", "Nama lengkap minimal 2 huruf");
+            model.addAttribute("user", user);
             return "register";
         }
 
-        // CEK USERNAME
+        // CEK USERNAME SUDAH ADA
         if (authService.existsByUsername(user.getUsername())) {
             model.addAttribute("error", "Username sudah digunakan");
+            model.addAttribute("user", user);
             return "register";
         }
 
+        // Jika semua validasi lolos
         authService.register(user);
-        return "redirect:/login";
+        return "redirect:/login?success=register"; // opsional: tambah parameter success
     }
 
     @GetMapping("/login")
@@ -88,12 +105,25 @@ public class AuthController {
             HttpSession session,
             Model model) {
 
-        User user = authService.login(username, password);
+        // Validasi input kosong
+        if (username == null || username.trim().isBlank()) {
+            model.addAttribute("error", "Username wajib diisi");
+            return "login";
+        }
+
+        if (password == null || password.isBlank()) {
+            model.addAttribute("error", "Password wajib diisi");
+            return "login";
+        }
+
+        User user = authService.login(username.trim(), password);
+
         if (user == null) {
             model.addAttribute("error", "Username atau password salah");
             return "login";
         }
 
+        // Login sukses → simpan ke session
         session.setAttribute("user", user);
         return "redirect:/dashboard";
     }
