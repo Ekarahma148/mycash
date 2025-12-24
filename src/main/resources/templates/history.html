@@ -1,49 +1,107 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
   <head>
     <meta charset="UTF-8" />
-    <title>History Aktivitas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Riwayat Aktivitas - MyCash</title>
     <link rel="stylesheet" th:href="@{/css/app.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
   </head>
   <body>
-    <div th:replace="fragments/sidebar :: sidebar"></div>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <main class="content">
       <div class="container">
-        <h1>History Aktivitas</h1>
+        <!-- Judul Halaman -->
+        <div class="dashboard-header mb-6">
+          <h1 style="font-size: 1.9rem">Riwayat Aktivitas</h1>
+          <p style="color: var(--text-light)">
+            Log semua perubahan di aplikasi
+          </p>
+        </div>
 
-        <!-- SEARCH -->
-        <form method="get" th:action="@{/history}">
-          <input
-            type="text"
-            name="keyword"
-            placeholder="Cari aktivitas..."
-            th:value="${keyword}"
-          />
-          <button type="submit">Cari</button>
-          <a th:href="@{/history}">Reset</a>
-        </form>
+        <!-- Form Pencarian -->
+        <div class="search-container mb-6">
+          <form
+            method="get"
+            th:action="@{/history}"
+            class="flex gap-3 items-end"
+          >
+            <div class="form-group flex-1">
+              <label class="form-label">
+                <i
+                  class="fas fa-search mr-2"
+                  style="color: var(--navy-primary)"
+                ></i>
+                Cari Aktivitas
+              </label>
+              <input
+                type="text"
+                name="keyword"
+                placeholder="Kata kunci aksi atau keterangan..."
+                th:value="${keyword}"
+                class="form-control"
+              />
+            </div>
+            <div>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Cari
+              </button>
+            </div>
+            <div>
+              <a th:href="@{/history}" class="btn btn-outline">Reset</a>
+            </div>
+          </form>
+        </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Waktu</th>
-              <th>Aksi</th>
-              <th>Keterangan</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="log : ${logs}">
-              <td th:text="${log.createdAt}"></td>
-              <td th:text="${log.action}"></td>
-              <td th:text="${log.description}"></td>
-            </tr>
+        <!-- Tabel History -->
+        <div class="table-container">
+          <table style="font-size: 0.95rem">
+            <thead>
+              <tr>
+                <th>Waktu</th>
+                <th>Aksi</th>
+                <th>Keterangan</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="log : ${logs}">
+                <td
+                  th:text="${#temporals.format(log.createdAt, 'dd MMM yyyy HH:mm')}"
+                >
+                  21 Dec 2025 10:00
+                </td>
+                <td>
+                  <span class="font-medium" th:text="${log.action}"
+                    >CREATE</span
+                  >
+                </td>
+                <td th:text="${log.description}">Deskripsi log</td>
+              </tr>
 
-            <tr th:if="${#lists.isEmpty(logs)}">
-              <td colspan="3">Tidak ada data</td>
-            </tr>
-          </tbody>
-        </table>
+              <!-- Jika tidak ada data -->
+              <tr th:if="${#lists.isEmpty(logs)}">
+                <td
+                  colspan="3"
+                  class="text-center py-8"
+                  style="color: var(--text-light)"
+                >
+                  <i
+                    class="fas fa-history text-4xl mb-4 block"
+                    style="opacity: 0.5"
+                  ></i>
+                  <div>Tidak ada aktivitas</div>
+                  <div class="text-sm mt-1">
+                    Log akan muncul saat ada perubahan data
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </main>
   </body>

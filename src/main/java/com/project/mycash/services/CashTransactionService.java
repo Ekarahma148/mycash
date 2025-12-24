@@ -2,63 +2,54 @@ package com.project.mycash.services;
 
 import java.time.LocalDate;
 import java.util.List;
-
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 import com.project.mycash.models.CashTransaction;
+import com.project.mycash.models.CategoryKas;
 import com.project.mycash.models.JournalEntry;
 import com.project.mycash.models.TransactionType;
 import com.project.mycash.models.User;
 import com.project.mycash.repositories.CashTransactionRepository;
+import com.project.mycash.repositories.CategoryKasRepository;
 import com.project.mycash.repositories.JournalEntryRepository;
-
+import org.springframework.data.domain.Sort;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CashTransactionService {
 
     private final CashTransactionRepository repo;
     private final JournalEntryRepository journalRepo;
     private final ActivityLogService logService;
+    private final CategoryKasRepository categoryRepo;
 
-    public List<CashTransaction> findByPeriod(LocalDate start, LocalDate end) {
-        return repo.findAll().stream()
-                .filter(tx -> !tx.getDate().isBefore(start) && !tx.getDate().isAfter(end))
-                .toList();
-    }
-
-    public List<CashTransaction> findByUserAndPeriod(
-            User user,
-            LocalDate start,
-            LocalDate end) {
-        return repo.findByUserAndDateBetween(user, start, end);
-    }
-
-    public CashTransaction findById(Long id) {
-        return repo.findById(id).orElse(null);
-    }
-
-    public List<CashTransaction> getAll(String keyword, String sortField) {
-        Sort sort = Sort.by(sortField).ascending();
-        if (keyword != null && !keyword.isEmpty()) {
-            return repo.findByDescriptionContainingIgnoreCase(keyword, sort);
-        }
-        return repo.findAll(sort);
-    }
-
-    @Transactional
     public CashTransaction save(CashTransaction tx) {
 
         boolean isNew = (tx.getId() == null);
+
+        if (tx.getCategory() == null || tx.getCategory().getId() == null) {
+            throw new RuntimeException("Kategori wajib dipilih");
+        }
+
+        // 🔥 AMBIL KATEGORI ASLI DARI DATABASE
+        CategoryKas category = categoryRepo.findById(tx.getCategory().getId())
+                .orElseThrow(() -> new RuntimeException("Kategori tidak ditemukan"));
+
+        if (category.getAccountName() == null ||
+                category.getAccountName().isBlank()) {
+            throw new RuntimeException("Kategori belum memiliki akun jurnal");
+        }
+
+        // 🔥 SET CATEGORY YANG SUDAH LENGKAP
+        tx.setCategory(category);
 
         CashTransaction saved = repo.save(tx);
 
         JournalEntry journal = journalRepo
                 .findByTransaction(saved)
-                .orElse(new JournalEntry());
+                .orElseGet(JournalEntry::new);
 
         journal.setTransaction(saved);
         journal.setDate(saved.getDate());
@@ -66,31 +57,23 @@ public class CashTransactionService {
 
         if (saved.getType() == TransactionType.IN) {
             journal.setDebitAccount("Kas");
-            journal.setCreditAccount("Pendapatan");
+            journal.setCreditAccount(category.getAccountName());
         } else {
-            journal.setDebitAccount("Beban");
+            journal.setDebitAccount(category.getAccountName());
             journal.setCreditAccount("Kas");
         }
 
         journalRepo.save(journal);
 
-        // 🔥 HISTORY
-        if (isNew) {
-            logService.log(
-                    saved.getUser(),
-                    "CREATE",
-                    "Menambah transaksi: " + saved.getDescription());
-        } else {
-            logService.log(
-                    saved.getUser(),
-                    "UPDATE",
-                    "Mengubah transaksi: " + saved.getDescription());
-        }
+        logService.log(
+                saved.getUser(),
+                isNew ? "CREATE" : "UPDATE",
+                (isNew ? "Menambah" : "Mengubah") +
+                        " transaksi: " + saved.getDescription());
 
         return saved;
     }
 
-    @Transactional
     public void delete(Long id) {
         CashTransaction tx = repo.findById(id).orElse(null);
         if (tx == null)
@@ -104,4 +87,27 @@ public class CashTransactionService {
                 "DELETE",
                 "Menghapus transaksi: " + tx.getDescription());
     }
+
+    public List<CashTransaction> findByUserAndPeriod(
+            User user,
+            LocalDate start,
+            LocalDate end,
+            String sortDir) {
+
+        Sort sort = Sort.by("date");
+
+        if ("asc".equalsIgnoreCase(sortDir)) {
+            sort = sort.ascending();
+        } else {
+            sort = sort.descending(); // default
+        }
+
+        return repo.findByUserAndDateBetween(user, start, end, sort);
+    }
+
+    public CashTransaction findById(Long id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaksi tidak ditemukan"));
+    }
+
 }

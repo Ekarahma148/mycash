@@ -36,11 +36,11 @@
                     </div>
                     <h3>Pemasukan</h3>
                     <p class="amount">
-                        Rp <span th:text="${#numbers.formatCurrency(totalIn ?: 0)}">0</span>
-                    </p>
+    Rp <span th:text="${#numbers.formatDecimal(totalIn ?: 0, 0, 'COMMA', 0, 'POINT')}">0</span>
+</p>
+
                     <div class="card-trend trend-up">
                         <i class="fas fa-caret-up"></i>
-                        <span>+12% dari bulan lalu</span>
                     </div>
                 </div>
             </div>
@@ -52,11 +52,10 @@
                     </div>
                     <h3>Pengeluaran</h3>
                     <p class="amount">
-                        Rp <span th:text="${#numbers.formatCurrency(totalOut ?: 0)}">0</span>
+                        Rp <span th:text="${#numbers.formatDecimal(totalOut ?: 0, 0, 'COMMA', 0, 'POINT')}">0</span>
                     </p>
                     <div class="card-trend trend-down">
                         <i class="fas fa-caret-down"></i>
-                        <span>-5% dari bulan lalu</span>
                     </div>
                 </div>
             </div>
@@ -68,7 +67,7 @@
                     </div>
                     <h3>Saldo Saat Ini</h3>
                     <p class="amount">
-                        Rp <span th:text="${#numbers.formatCurrency(balance ?: 0)}">0</span>
+                        Rp <span th:text="${#numbers.formatDecimal(balance ?: 0, 0, 'COMMA', 0, 'POINT')}">0</span>
                     </p>
                     <div class="card-trend"
                          th:classappend="${balance >= 0 ? 'trend-up' : 'trend-down'}">
@@ -76,45 +75,6 @@
                         <span th:text="${balance >= 0 ? 'Keuangan Sehat' : 'Perlu Perhatian'}">
                             Sehat
                         </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chart Section -->
-        <div class="charts-section">
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3>Statistik Bulan Ini</h3>
-                    <div class="chart-legend">
-                        <div class="legend-item">
-                            <div class="legend-color income"></div>
-                            <span>Pemasukan</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color expense"></div>
-                            <span>Pengeluaran</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="chart-placeholder flex items-center">
-                    <i class="fas fa-chart-line" style="font-size: 3.5rem; opacity: 0.8; margin-right: 1.5rem;"></i>
-                    <div>
-                        <h4>Grafik Bulanan</h4>
-                        <p style="color: var(--text-light);">Trend pemasukan vs pengeluaran bulan ini</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3>Kategori Pengeluaran</h3>
-                </div>
-                <div class="chart-placeholder flex items-center">
-                    <i class="fas fa-chart-pie" style="font-size: 3.5rem; opacity: 0.8; margin-right: 1.5rem;"></i>
-                    <div>
-                        <h4>Distribusi Kategori</h4>
-                        <p style="color: var(--text-light);">Persentase pengeluaran per kategori</p>
                     </div>
                 </div>
             </div>

@@ -1,14 +1,11 @@
 package com.project.mycash.models;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-
-import java.util.List;
 
 @Entity
 @Table(name = "categories")
@@ -16,8 +13,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = "transactions")
-@EqualsAndHashCode(exclude = "transactions")
 public class CategoryKas {
 
     @Id
@@ -27,6 +22,10 @@ public class CategoryKas {
     @NotBlank
     private String name;
 
-    @OneToMany(mappedBy = "category")
-    private List<CashTransaction> transactions;
+    @NotBlank
+    private String accountName;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

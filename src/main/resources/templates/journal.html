@@ -1,45 +1,97 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
   <head>
     <meta charset="UTF-8" />
-    <title>Jurnal Umum</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jurnal Umum - MyCash</title>
     <link rel="stylesheet" th:href="@{/css/app.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
   </head>
   <body>
     <!-- SIDEBAR -->
-    <div th:replace="fragments/sidebar :: sidebar"></div>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <!-- CONTENT -->
-    <div class="content">
+    <main class="content">
       <div class="container">
-        <h1>Jurnal Umum</h1>
+        <!-- Judul Halaman -->
+        <div class="dashboard-header mb-8">
+          <h1 style="font-size: 2rem">Jurnal Umum</h1>
+          <p style="color: var(--text-light); margin-top: 0.5rem">
+            Catatan lengkap semua transaksi dalam bentuk jurnal akuntansi
+          </p>
+        </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Tanggal</th>
-              <th>Debit</th>
-              <th>Kredit</th>
-              <th>Jumlah</th>
-              <th>Keterangan</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="j : ${journals}">
-              <td th:text="${j.date}"></td>
-              <td th:text="${j.debitAccount}"></td>
-              <td th:text="${j.creditAccount}"></td>
-              <td>
-                Rp
-                <span
-                  th:text="${#numbers.formatDecimal(j.amount, 0, 'POINT', 2, 'COMMA')}"
-                ></span>
-              </td>
-              <td th:text="${j.transaction.description}"></td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- Tabel Jurnal -->
+        <div class="table-container">
+          <table style="font-size: 0.95rem">
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Debit</th>
+                <th>Kredit</th>
+                <th>Jumlah</th>
+                <th>Keterangan</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="j : ${journals}">
+                <td th:text="${#temporals.format(j.date, 'dd MMM yyyy')}">
+                  21 Dec 2025
+                </td>
+                <td
+                  th:text="${j.debitAccount ?: '-'}"
+                  class="font-medium text-blue-700"
+                >
+                  Debit Akun
+                </td>
+                <td
+                  th:text="${j.creditAccount ?: '-'}"
+                  class="font-medium text-purple-700"
+                >
+                  Kredit Akun
+                </td>
+                <td
+                  class="font-bold"
+                  th:classappend="${j.transaction.type.name() == 'IN'} ? 'text-success' : 'text-danger'"
+                >
+                  <span
+                    th:text="${#numbers.formatDecimal(j.amount, 0, 'COMMA', 0, 'POINT')}"
+                    >0</span
+                  >
+                </td>
+                <td
+                  th:text="${j.transaction.description ?: '- Tidak ada keterangan -'}"
+                >
+                  Keterangan transaksi
+                </td>
+              </tr>
+
+              <!-- Jika tidak ada data -->
+              <tr th:if="${#lists.isEmpty(journals)}">
+                <td
+                  colspan="5"
+                  class="text-center py-12"
+                  style="color: var(--text-light)"
+                >
+                  <i
+                    class="fas fa-book-open text-6xl mb-6 block"
+                    style="opacity: 0.4"
+                  ></i>
+                  <div class="text-xl mb-2">Belum ada entri jurnal</div>
+                  <div class="text-base">
+                    Setiap transaksi yang Anda buat akan otomatis tercatat di
+                    sini
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </main>
   </body>
 </html>

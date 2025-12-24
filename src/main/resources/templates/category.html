@@ -1,48 +1,127 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
   <head>
     <meta charset="UTF-8" />
-    <title>Kategori Kas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manajemen Kategori - MoneyTracker</title>
     <link rel="stylesheet" th:href="@{/css/app.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
   </head>
   <body>
-    <div th:replace="fragments/sidebar :: sidebar"></div>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <main class="content">
       <div class="container">
-        <h1>Manajemen Kategori</h1>
+        <!-- Judul Halaman -->
+        <div class="dashboard-header mb-6">
+          <h1 style="font-size: 1.9rem">Manajemen Kategori</h1>
+          <p style="color: var(--text-light)">
+            Tambah atau lihat daftar kategori transaksi
+          </p>
+        </div>
 
-        <form th:action="@{/categories}" th:object="${category}" method="post">
-          <label
-            >Nama Kategori
-            <input type="text" th:field="*{name}" />
-          </label>
+        <!-- Form Tambah Kategori -->
+        <div class="auth-card" style="max-width: 600px; margin-bottom: 3rem">
+          <form
+            th:action="@{/categories}"
+            th:object="${category}"
+            method="post"
+            class="p-2"
+          >
+            <!-- Nama Kategori -->
+            <div class="form-group">
+              <label class="form-label">
+                <i
+                  class="fas fa-tag mr-2"
+                  style="color: var(--navy-primary)"
+                ></i>
+                Nama Kategori
+              </label>
+              <input
+                type="text"
+                th:field="*{name}"
+                class="form-control"
+                placeholder="Contoh: Makan, Transport, Gaji"
+                required
+              />
+            </div>
 
-          <p
-            class="error"
-            th:if="${#fields.hasErrors('name')}"
-            th:errors="*{name}"
-          ></p>
+            <!-- Nama Akun Jurnal -->
+            <div class="form-group mt-4">
+              <label class="form-label">
+                <i
+                  class="fas fa-book mr-2"
+                  style="color: var(--navy-primary)"
+                ></i>
+                Nama Akun (Jurnal)
+              </label>
+              <input
+                type="text"
+                th:field="*{accountName}"
+                class="form-control"
+                placeholder="Contoh: Beban Makan, Pendapatan"
+                required
+              />
+              <small style="color: var(--text-light)">
+                Digunakan untuk pencatatan jurnal debit / kredit
+              </small>
+            </div>
 
-          <button type="submit">Simpan</button>
-        </form>
+            <button type="submit" class="btn btn-primary mt-6">
+              <i class="fas fa-save mr-2"></i> Simpan Kategori
+            </button>
+          </form>
+        </div>
 
-        <hr />
+        <hr style="border-color: var(--border-color); margin: 3rem 0" />
 
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nama</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="c : ${categories}">
-              <td th:text="${c.id}"></td>
-              <td th:text="${c.name}"></td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- Daftar Kategori -->
+        <h2
+          style="
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--navy-primary);
+          "
+        >
+          Daftar Kategori
+        </h2>
+        <div class="table-container">
+          <table style="font-size: 0.95rem">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nama Kategori</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="c : ${categories}">
+                <td th:text="${c.id}">1</td>
+                <td th:text="${c.name}">Kategori</td>
+              </tr>
+
+              <!-- Jika tidak ada kategori -->
+              <tr th:if="${#lists.isEmpty(categories)}">
+                <td
+                  colspan="2"
+                  class="text-center py-8"
+                  style="color: var(--text-light)"
+                >
+                  <i
+                    class="fas fa-tags text-4xl mb-4 block"
+                    style="opacity: 0.5"
+                  ></i>
+                  <div>Belum ada kategori</div>
+                  <div class="text-sm mt-1">
+                    Tambahkan kategori pertama Anda di atas
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </main>
   </body>

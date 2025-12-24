@@ -37,14 +37,12 @@ public class CashTransaction {
 
     @NotBlank
     private String description;
-
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "category_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
     private CategoryKas category;
 
-    @ManyToOne
-@JoinColumn(name = "user_id")
-private User user;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

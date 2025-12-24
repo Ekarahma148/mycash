@@ -1,115 +1,208 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="id">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Daftar Transaksi Kas - MoneyTracker</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daftar Transaksi Kas - MyCash</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-<div th:replace="~{fragments/sidebar :: sidebar}"></div>
-
-<main class="content">
-    <div class="container">
-
-        <!-- Judul Halaman - Lebih Kecil & Rapi -->
-        <div class="dashboard-header mb-4">
-            <h1 style="font-size: 1.8rem;">Daftar Transaksi Kas</h1>
-            <p style="color: var(--text-light); font-size: 0.95rem; margin-top: 0.4rem;">
-                Kelola pemasukan dan pengeluaran Anda
-            </p>
+    <main class="content">
+      <div class="container">
+        <!-- Judul Halaman -->
+        <div class="dashboard-header mb-6">
+          <h1 style="font-size: 2rem">Daftar Transaksi Kas</h1>
+          <p
+            style="
+              color: var(--text-light);
+              font-size: 1rem;
+              margin-top: 0.5rem;
+            "
+          >
+            Kelola semua pemasukan dan pengeluaran Anda dengan mudah
+          </p>
         </div>
 
-        <!-- Form Filter - Compact -->
-        <div class="search-container p-3 mb-4">
-            <form method="get" action="/transactions" class="search-form gap-2">
-                <div class="form-group">
-                    <label class="form-label text-sm">Mulai</label>
-                    <input type="date" name="start" th:value="${start}" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label class="form-label text-sm">Sampai</label>
-                    <input type="date" name="end" th:value="${end}" class="form-control"/>
-                </div>
-                <div class="form-group" style="align-self: end;">
-                    <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.25rem; font-size: 0.9rem;">
-                        <i class="fas fa-filter"></i>
-                    </button>
-                </div>
+        <!-- Filter & Sort Bar -->
+        <div
+          class="flex flex-col md:flex-row justify-between items-end gap-4 mb-6"
+        >
+          <!-- Form Filter Tanggal -->
+          <div class="search-container p-4 flex-1">
+            <form
+              method="get"
+              action="/transactions"
+              class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end"
+            >
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="fas fa-calendar-alt mr-2"></i> Tanggal Mulai
+                </label>
+                <input
+                  type="date"
+                  name="start"
+                  th:value="${start}"
+                  class="form-control"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="fas fa-calendar-alt mr-2"></i> Tanggal Sampai
+                </label>
+                <input
+                  type="date"
+                  name="end"
+                  th:value="${end}"
+                  class="form-control"
+                />
+              </div>
+              <div>
+                <button type="submit" class="btn btn-primary w-full">
+                  <i class="fas fa-filter mr-2"></i> Filter
+                </button>
+              </div>
             </form>
+          </div>
+
+          <!-- Sort & Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-3 items-end">
+            <!-- Sort Form -->
+            <form method="get" class="flex items-end gap-2">
+              <input type="hidden" name="start" th:value="${start}" />
+              <input type="hidden" name="end" th:value="${end}" />
+              <div class="form-group">
+                <label class="form-label text-sm">Urutkan</label>
+                <select
+                  name="sort"
+                  class="form-control"
+                  onchange="this.form.submit()"
+                >
+                  <option
+                    value="desc"
+                    th:selected="${sort == 'desc' or sort == null}"
+                  >
+                    Terbaru Dulu
+                  </option>
+                  <option value="asc" th:selected="${sort == 'asc'}">
+                    Terlama Dulu
+                  </option>
+                </select>
+              </div>
+            </form>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3">
+              <a th:href="@{/transactions/new}" class="btn btn-success">
+                <i class="fas fa-plus mr-2"></i> Tambah
+              </a>
+              <a th:href="@{/journals}" class="btn btn-outline">
+                <i class="fas fa-book mr-2"></i> Jurnal
+              </a>
+            </div>
+          </div>
         </div>
 
-        <!-- Action Bar - Tombol Lebih Kecil -->
-        <div class="flex justify-end mb-4 gap-2">
-            <a th:href="@{/transactions/new}" class="btn btn-success" style="padding: 0.65rem 1rem; font-size: 0.9rem;">
-                <i class="fas fa-plus"></i> Tambah
-            </a>
-            <a th:href="@{/journals}" class="btn btn-outline" style="padding: 0.65rem 1rem; font-size: 0.9rem;">
-                <i class="fas fa-book"></i> Jurnal
-            </a>
-        </div>
-
-        <!-- Tabel Transaksi - Baris Lebih Rapat & Font Kecil -->
+        <!-- Tabel Transaksi -->
         <div class="table-container">
-            <table style="font-size: 0.92rem;">
-                <thead>
-                    <tr>
-                        <th style="padding: 0.9rem 1rem;">Tanggal</th>
-                        <th style="padding: 0.9rem 1rem;">Tipe</th>
-                        <th style="padding: 0.9rem 1rem;">Jumlah</th>
-                        <th style="padding: 0.9rem 1rem;">Kategori</th>
-                        <th style="padding: 0.9rem 1rem;">Deskripsi</th>
-                        <th class="text-center" style="padding: 0.9rem 1rem;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="t : ${transactions}">
-                        <td th:text="${#temporals.format(t.date, 'dd MMM yyyy')}">
-                            01 Jan 2025
-                        </td>
-                        <td>
-                            <span th:class="${t.type.name() == 'IN'} ? 'text-success font-medium' : 'text-danger font-medium'"
-                                  th:text="${t.type.name() == 'IN' ? 'Masuk' : 'Keluar'}">
-                                Tipe
-                            </span>
-                        </td>
-                        <td>
-                            <span th:class="${t.type.name() == 'IN'} ? 'text-success font-medium' : 'text-danger font-medium'"
-                                  th:text="${t.type.name() == 'IN' ? '+ Rp ' : '- Rp '} + ${#numbers.formatCurrency(t.amount)}">
-                                Rp 0
-                            </span>
-                        </td>
-                        <td th:text="${t.category != null ? t.category.name : '-'}">-</td>
-                        <td th:text="${t.description ?: '-'}">-</td>
-                        <td class="table-actions text-center">
-                            <a th:href="@{'/transactions/edit/' + ${t.id}}"
-                               class="btn btn-warning" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <a th:href="@{'/transactions/confirm-delete/' + ${t.id}}"
-                               class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;"
-                               onclick="return confirm('Yakin hapus transaksi ini?')">
-                                <i class="fas fa-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
+          <table>
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Tipe</th>
+                <th>Jumlah</th>
+                <th>Kategori</th>
+                <th>Deskripsi</th>
+                <th class="text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="t : ${transactions}">
+                <td th:text="${#temporals.format(t.date, 'dd MMMM yyyy')}">
+                  01 Januari 2025
+                </td>
+                <td>
+                  <span
+                    class="px-3 py-1 rounded-full text-sm font-semibold"
+                    th:class="${t.type.name() == 'IN'} ? 'bg-green-100 text-success' : 'bg-red-100 text-danger'"
+                    th:text="${t.type.name() == 'IN' ? 'Pemasukan' : 'Pengeluaran'}"
+                  >
+                    Pemasukan
+                  </span>
+                </td>
+                <td
+                  class="font-bold"
+                  th:classappend="${t.type.name() == 'IN'} ? 'text-success' : 'text-danger'"
+                >
+                  <span
+                    th:text="${t.type.name() == 'IN' ? '+ Rp ' : '- Rp '} + ${#numbers.formatDecimal(t.amount, 0, 'COMMA', 0, 'POINT')}"
+                  >
+                    + Rp 500.000
+                  </span>
+                </td>
+                <td
+                  th:text="${t.category != null ? t.category.name : '-'}"
+                  class="text-gray-600"
+                >
+                  Makanan
+                </td>
+                <td th:text="${t.description ?: '-'}" class="max-w-xs truncate">
+                  Belanja bulanan di supermarket
+                </td>
+                <td class="table-actions text-center">
+                  <a
+                    th:href="@{'/transactions/edit/' + ${t.id}}"
+                    class="btn btn-warning btn-sm"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <a
+                    th:href="@{'/transactions/confirm-delete/' + ${t.id}}"
+                    class="btn btn-danger btn-sm"
+                    onclick="return confirm('Yakin ingin menghapus transaksi ini?')"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </a>
+                </td>
+              </tr>
 
-                    <!-- Jika tidak ada transaksi -->
-                    <tr th:if="${#lists.isEmpty(transactions)}">
-                        <td colspan="6" class="text-center py-6" style="color: var(--text-light); font-size: 0.95rem;">
-                            <i class="fas fa-inbox text-4xl mb-3 block" style="opacity: 0.5;"></i>
-                            <div>Belum ada transaksi</div>
-                            <div class="text-sm mt-1">Mulai dengan menambah transaksi baru</div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+              <!-- Jika tidak ada transaksi -->
+              <tr th:if="${#lists.isEmpty(transactions)}">
+                <td colspan="6" class="text-center py-16">
+                  <i
+                    class="fas fa-receipt text-7xl mb-6 block"
+                    style="color: var(--text-light); opacity: 0.4"
+                  ></i>
+                  <div class="text-xl font-medium mb-2">
+                    Belum ada transaksi
+                  </div>
+                  <p
+                    style="
+                      color: var(--text-light);
+                      max-width: 400px;
+                      margin: 0 auto;
+                    "
+                  >
+                    Mulai catat keuangan Anda dengan menambahkan transaksi
+                    pertama
+                  </p>
+                  <a
+                    th:href="@{/transactions/new}"
+                    class="btn btn-primary mt-6"
+                  >
+                    <i class="fas fa-plus mr-2"></i> Tambah Transaksi Pertama
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-
-    </div>
-</main>
-
-</body>
+      </div>
+    </main>
+  </body>
 </html>
