@@ -118,7 +118,6 @@ p {
 }
 
 .sidebar h2::after {
-    content: '💰';
     position: absolute;
     right: 0;
     top: 50%;
@@ -545,22 +544,23 @@ p {
    FORMS
 ========================= */
 .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.9rem;
 }
 
 .form-label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem;
+    font-size: 0.85rem;
     font-weight: 600;
     color: var(--navy-dark);
 }
 
 .form-control {
     width: 100%;
-    padding: 1rem 1.25rem;
-    border-radius: 12px;
+    padding: 0.55rem 0.75rem;
+    border-radius: 10px;
     border: 2px solid var(--border-color);
-    font-size: 1rem;
+    font-size: 0.9rem;
     transition: all 0.3s ease;
     background: #f8fafc;
 }
@@ -576,7 +576,7 @@ p {
    BUTTONS
 ========================= */
 .btn {
-    padding: 1rem 2rem;
+    padding: 0.75rem 1rem;
     border: none;
     border-radius: 12px;
     font-weight: 600;
@@ -703,21 +703,22 @@ tbody td {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    padding: 2rem;
-    background: linear-gradient(135deg, var(--navy-dark), var(--navy-primary));
+    min-height: 90vh;
+    padding: 1rem;
+    background: linear-gradient(120deg, var(--navy-dark), var(--navy-primary));
 }
 
 .auth-card {
     background: var(--card-bg);
-    padding: 3rem;
-    border-radius: 24px;
+    padding: 1.5rem;              
+    border-radius: 20px;          
     box-shadow: var(--shadow-lg);
     width: 100%;
-    max-width: 500px;
+    max-width: 360px;             
     animation: slideUp 0.6s ease;
     border: 1px solid rgba(30, 64, 175, 0.1);
 }
+
 
 .auth-card::before {
     content: '';
@@ -725,23 +726,26 @@ tbody td {
     top: 0;
     left: 0;
     width: 100%;
-    height: 4px;
+    height: 10px;
     background: linear-gradient(90deg, var(--navy-primary), var(--accent-teal));
-    border-radius: 24px 24px 0 0;
+    border-radius: 40px 40px 0 0;
 }
 
 .auth-header {
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .auth-header h1 {
-    margin-bottom: 0.5rem;
+    font-size: 1.6rem;
+    margin-bottom: 0.3rem;
 }
 
 .auth-subtitle {
     color: var(--text-light);
-    margin-bottom: 2rem;
+    line-height: 1.4;
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
 }
 
 .auth-error {
@@ -757,7 +761,7 @@ tbody td {
 
 .auth-links {
     text-align: center;
-    margin-top: 2rem;
+    margin-top: 1.2rem;
     padding-top: 1.5rem;
     border-top: 1px solid var(--border-color);
 }

@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - MyCash</title>
     <link rel="stylesheet" th:href="@{/css/app.css}" />
-    <!-- Jika pakai Font Awesome untuk icon (opsional tapi direkomendasikan) -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    />
   </head>
   <body>
     <div class="auth-container">
@@ -17,7 +12,6 @@
         <!-- Gradient top bar -->
         <div class="auth-header text-center">
           <h1 style="color: var(--navy-primary); margin-bottom: 0.5rem">
-            <i class="fas fa-wallet" style="margin-right: 0.5rem"></i>
             MyCash
           </h1>
           <p class="auth-subtitle">
@@ -27,23 +21,19 @@
 
         <!-- Error Message -->
         <div th:if="${error}" class="auth-error">
-          <i
-            class="fas fa-exclamation-triangle"
-            style="margin-right: 0.5rem"
-          ></i>
           <span th:text="${error}"></span>
         </div>
 
         <!-- Login Form -->
         <form method="post" th:action="@{/login}">
           <div class="form-group">
-            <label class="form-label" for="username">Username atau Email</label>
+            <label class="form-label" for="username">Username</label>
             <input
               type="text"
               id="username"
               name="username"
               class="form-control"
-              placeholder="Masukkan username atau email"
+              placeholder="Masukkan username "
               required
               autocomplete="username"
             />
@@ -57,6 +47,8 @@
               name="password"
               class="form-control"
               placeholder="Masukkan password"
+              maxlength="8"
+              minlength="6"
               required
               autocomplete="current-password"
             />
@@ -67,7 +59,6 @@
             class="btn btn-primary"
             style="width: 100%; margin-top: 1rem"
           >
-            <i class="fas fa-sign-in-alt" style="margin-right: 0.5rem"></i>
             Masuk
           </button>
         </form>
@@ -78,17 +69,9 @@
             Belum punya akun?
           </p>
           <a th:href="@{/register}" class="btn btn-outline" style="width: 100%">
-            <i class="fas fa-user-plus" style="margin-right: 0.5rem"></i>
             Daftar Sekarang
           </a>
-        </div>
-
-        <!-- Optional: Back to home atau forgot password -->
-        <!--
-        <div class="text-center mt-3">
-            <a href="#" style="color: var(--text-light); font-size: 0.9rem;">Lupa password?</a>
-        </div>
-        -->
+        </div>       
       </div>
     </div>
   </body>

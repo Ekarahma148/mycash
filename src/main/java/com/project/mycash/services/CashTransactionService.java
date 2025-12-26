@@ -1,5 +1,6 @@
 package com.project.mycash.services;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,11 @@ public class CashTransactionService {
     private final ActivityLogService logService;
     private final CategoryKasRepository categoryRepo;
 
+    private String formatRupiah(Number amount) {
+        return "Rp " + String.format("%,.0f", amount)
+                .replace(',', '.');
+    }
+
     public CashTransaction save(CashTransaction tx) {
 
         boolean isNew = (tx.getId() == null);
@@ -33,18 +39,39 @@ public class CashTransactionService {
             throw new RuntimeException("Kategori wajib dipilih");
         }
 
-        // 🔥 AMBIL KATEGORI ASLI DARI DATABASE
+        // 🔥 AMBIL KATEGORI ASLI
         CategoryKas category = categoryRepo.findById(tx.getCategory().getId())
                 .orElseThrow(() -> new RuntimeException("Kategori tidak ditemukan"));
 
-        if (category.getAccountName() == null ||
-                category.getAccountName().isBlank()) {
+        if (category.getAccountName() == null || category.getAccountName().isBlank()) {
             throw new RuntimeException("Kategori belum memiliki akun jurnal");
         }
 
-        // 🔥 SET CATEGORY YANG SUDAH LENGKAP
         tx.setCategory(category);
 
+        // =========================
+        // 🔴 VALIDASI SALDO
+        // =========================
+        if (tx.getType() == TransactionType.OUT) {
+
+            BigDecimal saldo = repo.getSaldoUser(tx.getUser());
+
+            if (!isNew) {
+                CashTransaction old = repo.findById(tx.getId()).orElse(null);
+                if (old != null && old.getType() == TransactionType.OUT) {
+                    saldo = saldo.add(old.getAmount());
+                }
+            }
+
+            if (tx.getAmount().compareTo(saldo) > 0) {
+                throw new RuntimeException(
+                        "Saldo tidak mencukupi. Saldo tersedia: Rp " + saldo);
+            }
+        }
+
+        // =========================
+        // SIMPAN TRANSAKSI
+        // =========================
         CashTransaction saved = repo.save(tx);
 
         JournalEntry journal = journalRepo
@@ -65,11 +92,22 @@ public class CashTransactionService {
 
         journalRepo.save(journal);
 
+        String tipe = saved.getType() == TransactionType.IN
+                ? "pemasukan"
+                : "pengeluaran";
+
+        String nominal = formatRupiah(saved.getAmount());
+
+        String aksi = isNew ? "Menambahkan" : "Mengubah";
+
+        String keterangan = aksi + " " + tipe +
+                " " + saved.getDescription() +
+                " sebesar " + nominal;
+
         logService.log(
                 saved.getUser(),
                 isNew ? "CREATE" : "UPDATE",
-                (isNew ? "Menambah" : "Mengubah") +
-                        " transaksi: " + saved.getDescription());
+                keterangan);
 
         return saved;
     }
@@ -82,10 +120,18 @@ public class CashTransactionService {
         journalRepo.deleteByTransactionId(id);
         repo.deleteById(id);
 
+        String tipe = tx.getType() == TransactionType.IN
+                ? "pemasukan"
+                : "pengeluaran";
+
+        String nominal = formatRupiah(tx.getAmount());
+
         logService.log(
                 tx.getUser(),
                 "DELETE",
-                "Menghapus transaksi: " + tx.getDescription());
+                "Menghapus " + tipe +
+                        " " + tx.getDescription() +
+                        " sebesar " + nominal);
     }
 
     public List<CashTransaction> findByUserAndPeriod(

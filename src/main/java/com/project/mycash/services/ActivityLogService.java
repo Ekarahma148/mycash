@@ -37,4 +37,5 @@ public class ActivityLogService {
 
         repo.save(log);
     }
+
 }

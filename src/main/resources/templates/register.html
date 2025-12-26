@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register - MyCash</title>
     <link rel="stylesheet" th:href="@{/css/app.css}" />
-    <!-- Font Awesome untuk icon (sama seperti login) -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    />
   </head>
   <body>
     <div class="auth-container">
@@ -17,7 +12,6 @@
         <!-- Header -->
         <div class="auth-header text-center">
           <h1 style="color: var(--navy-primary); margin-bottom: 0.5rem">
-            <i class="fas fa-wallet" style="margin-right: 0.5rem"></i>
             MyCash
           </h1>
           <p class="auth-subtitle">
@@ -27,17 +21,12 @@
 
         <!-- Error Message -->
         <div th:if="${error}" class="auth-error">
-          <i
-            class="fas fa-exclamation-triangle"
-            style="margin-right: 0.5rem"
-          ></i>
           <span th:text="${error}"></span>
         </div>
 
-        <!-- <div th:if="${success}" class="notification success" style="position: static; margin-bottom: 1.5rem;">
-            <i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>
+        <div th:if="${success}" class="notification success" style="position: static; margin-bottom: 1.5rem;">
             <span th:text="${success}"></span>
-        </div> -->
+        </div>
 
         <!-- Register Form -->
         <form method="post" th:action="@{/register}" th:object="${user}">
@@ -73,8 +62,9 @@
               id="password"
               th:field="*{password}"
               class="form-control"
-              placeholder="Maksimal 6 karakter"
-              maxlength="6"
+              placeholder="Maksimal 8 karakter"
+              maxlength="8"
+              minlength="6"
               required
               autocomplete="new-password"
             />
@@ -82,10 +72,6 @@
 
           <div class="form-group">
             <label class="form-label" for="fullName">
-              <i
-                class="fas fa-id-card"
-                style="margin-right: 0.5rem; color: var(--navy-primary)"
-              ></i>
               Nama Lengkap
             </label>
             <input
@@ -106,7 +92,6 @@
             class="btn btn-primary"
             style="width: 100%; margin-top: 1rem"
           >
-            <i class="fas fa-user-plus" style="margin-right: 0.5rem"></i>
             Daftar Sekarang
           </button>
         </form>
@@ -117,7 +102,6 @@
             Sudah punya akun?
           </p>
           <a th:href="@{/login}" class="btn btn-outline" style="width: 100%">
-            <i class="fas fa-sign-in-alt" style="margin-right: 0.5rem"></i>
             Masuk di Sini
           </a>
         </div>

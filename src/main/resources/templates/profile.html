@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Profil Pengguna - MyCash</title>
     <link rel="stylesheet" th:href="@{/css/app.css}"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/fontawesome.css}">
+
 </head>
 <body>
 
@@ -15,14 +16,8 @@
     <div class="container">
 
         <!-- Header Profil -->
-        <div class="dashboard-header text-center mb-10">
-            <div class="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-var(--navy-primary) to-var(--navy-secondary) rounded-full flex items-center justify-center text-white text-6xl shadow-xl">
-                <i class="fas fa-user"></i>
-            </div>
-            <h1 class="text-3xl font-bold">Pengaturan Profil</h1>
-            <p class="text-lg text-gray-600 mt-2">
-                Kelola informasi pribadi dan preferensi Anda
-            </p>
+        <div class="dashboard-header  mb-10">
+            <h1 class="text-3xl font-bold">Pengaturan Profil</h1>  
         </div>
 
         <!-- Card Utama -->
