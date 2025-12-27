@@ -1,83 +1,125 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="id">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Konfirmasi Hapus Transaksi - MyCash</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}"/>
-    <link rel="stylesheet" th:href="@{/css/fontawesome.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css}" />
+    <link rel="stylesheet" th:href="@{/css/fontawesome.css}" />
+  </head>
+  <body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-</head>
-<body>
+    <main class="content">
+      <div class="container">
+        <div
+          class="auth-card"
+          style="
+            max-width: 600px;
+            margin: 3rem auto;
+            padding: 3rem;
+            text-align: center;
+          "
+        >
+          <i
+            class="fas fa-exclamation-triangle text-6xl mb-6"
+            style="color: var(--danger); opacity: 0.8"
+          ></i>
 
-<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+          <h2
+            style="
+              font-size: 1.8rem;
+              margin-bottom: 1.5rem;
+              color: var(--text-dark);
+            "
+          >
+            Konfirmasi Hapus Transaksi
+          </h2>
 
-<main class="content">
-    <div class="container">
+          <p
+            style="
+              color: var(--text-light);
+              font-size: 1.1rem;
+              margin-bottom: 2rem;
+            "
+          >
+            Anda yakin ingin menghapus transaksi berikut? Tindakan ini
+            <strong>tidak dapat dibatalkan</strong>.
+          </p>
 
-        <!-- Card Konfirmasi Hapus -->
-        <div class="auth-card" style="max-width: 600px; margin: 3rem auto; padding: 3rem; text-align: center;">
-            <i class="fas fa-exclamation-triangle text-6xl mb-6" 
-               style="color: var(--danger); opacity: 0.8;"></i>
-
-            <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem; color: var(--text-dark);">
-                Konfirmasi Hapus Transaksi
-            </h2>
-
-            <p style="color: var(--text-light); font-size: 1.1rem; margin-bottom: 2rem;">
-                Anda yakin ingin menghapus transaksi berikut? Tindakan ini <strong>tidak dapat dibatalkan</strong>.
+          <div
+            class="text-left bg-gray-50 p-6 rounded-xl mb-8"
+            style="background: #f8fafc"
+          >
+            <p class="mb-4">
+              <span class="font-semibold" style="color: var(--text-dark)"
+                >Tanggal:</span
+              ><br />
+              <span
+                class="text-lg font-bold"
+                th:text="${#temporals.format(transaction.date, 'dd MMMM yyyy')}"
+              >
+                01 Januari 2025
+              </span>
             </p>
 
-            <!-- Detail Transaksi -->
-            <div class="text-left bg-gray-50 p-6 rounded-xl mb-8" style="background: #f8fafc;">
-                <p class="mb-4">
-                    <span class="font-semibold" style="color: var(--text-dark);">Tanggal:</span><br/>
-                    <span class="text-lg font-bold" th:text="${#temporals.format(transaction.date, 'dd MMMM yyyy')}">
-                        01 Januari 2025
-                    </span>
-                </p>
+            <p class="mb-4">
+              <span class="font-semibold" style="color: var(--text-dark)"
+                >Jumlah:</span
+              ><br />
+              <span
+                class="text-xl font-bold"
+                th:classappend="${transaction.type.name() == 'IN'} ? 'text-success' : 'text-danger'"
+                th:text="${transaction.type.name() == 'IN' ? '+ Rp ' : '- Rp '} + ${#numbers.formatCurrency(transaction.amount)}"
+              >
+                Rp 500.000
+              </span>
+            </p>
 
-                <p class="mb-4">
-                    <span class="font-semibold" style="color: var(--text-dark);">Jumlah:</span><br/>
-                    <span class="text-xl font-bold"
-                          th:classappend="${transaction.type.name() == 'IN'} ? 'text-success' : 'text-danger'"
-                          th:text="${transaction.type.name() == 'IN' ? '+ Rp ' : '- Rp '} + ${#numbers.formatCurrency(transaction.amount)}">
-                        Rp 500.000
-                    </span>
-                </p>
+            <p class="mb-4">
+              <span class="font-semibold" style="color: var(--text-dark)"
+                >Deskripsi:</span
+              ><br />
+              <span
+                class="text-lg"
+                th:text="${transaction.description ?: '- Tidak ada deskripsi -'}"
+              >
+                Belanja bulanan
+              </span>
+            </p>
 
-                <p class="mb-4">
-                    <span class="font-semibold" style="color: var(--text-dark);">Deskripsi:</span><br/>
-                    <span class="text-lg" th:text="${transaction.description ?: '- Tidak ada deskripsi -'}">
-                        Belanja bulanan
-                    </span>
-                </p>
+            <p th:if="${transaction.category != null}" class="mb-0">
+              <span class="font-semibold" style="color: var(--text-dark)"
+                >Kategori:</span
+              ><br />
+              <span class="text-lg" th:text="${transaction.category.name}"
+                >Makanan</span
+              >
+            </p>
+          </div>
 
-                <p th:if="${transaction.category != null}" class="mb-0">
-                    <span class="font-semibold" style="color: var(--text-dark);">Kategori:</span><br/>
-                    <span class="text-lg" th:text="${transaction.category.name}">Makanan</span>
-                </p>
-            </div>
+          <div class="flex gap-4 justify-center">
+            <a
+              th:href="@{/transactions}"
+              class="btn btn-outline flex-1"
+              style="padding: 1rem"
+            >
+              <i class="fas fa-arrow-left mr-3"></i>
+              Batal
+            </a>
 
-            <!-- Tombol Aksi -->
-            <div class="flex gap-4 justify-center">
-                <a th:href="@{/transactions}" class="btn btn-outline flex-1" style="padding: 1rem;">
-                    <i class="fas fa-arrow-left mr-3"></i>
-                    Batal
-                </a>
-
-                <a th:href="@{'/transactions/delete/' + ${transaction.id}}"
-                   class="btn btn-danger flex-1"
-                   style="padding: 1rem;"
-                   onclick="return confirm('Transaksi ini akan dihapus secara permanen. Lanjutkan?')">
-                    <i class="fas fa-trash mr-3"></i>
-                    Ya, Hapus Permanen
-                </a>
-            </div>
+            <a
+              th:href="@{'/transactions/delete/' + ${transaction.id}}"
+              class="btn btn-danger flex-1"
+              style="padding: 1rem"
+              onclick="return confirm('Transaksi ini akan dihapus secara permanen. Lanjutkan?')"
+            >
+              <i class="fas fa-trash mr-3"></i>
+              Ya, Hapus Permanen
+            </a>
+          </div>
         </div>
-
-    </div>
-</main>
-
-</body>
+      </div>
+    </main>
+  </body>
 </html>

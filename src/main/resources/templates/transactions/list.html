@@ -5,29 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Daftar Transaksi Kas - MyCash</title>
     <link rel="stylesheet" th:href="@{/css/app.css}" />
-<link rel="stylesheet" th:href="@{/css/fontawesome.css}">
+    <link rel="stylesheet" th:href="@{/css/fontawesome.css}" />
   </head>
   <body>
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <main class="content">
       <div class="container">
-        <!-- Judul Halaman -->
         <div class="dashboard-header mb-6">
           <h1 style="font-size: 2rem">Daftar Transaksi Kas</h1>
-        
         </div>
-
-        <!-- Filter & Sort Bar -->
         <div
           class="flex flex-col md:flex-row justify-between items-end gap-4 mb-6"
         >
-          <!-- Form Filter Tanggal -->
           <div class="search-container p-4 flex-1">
             <form
               method="get"
-              action="/transactions"
-              class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end"
+              th:action="@{/transactions}"
+              class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end"
             >
               <div class="form-group">
                 <label class="form-label">
@@ -40,6 +35,7 @@
                   class="form-control"
                 />
               </div>
+
               <div class="form-group">
                 <label class="form-label">
                   <i class="fas fa-calendar-alt mr-2"></i> Tanggal Sampai
@@ -51,6 +47,22 @@
                   class="form-control"
                 />
               </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="fas fa-exchange-alt mr-2"></i> Tipe
+                </label>
+                <select name="type" class="form-control">
+                  <option value="">Semua</option>
+                  <option value="IN" th:selected="${type == 'IN'}">
+                    Pemasukan
+                  </option>
+                  <option value="OUT" th:selected="${type == 'OUT'}">
+                    Pengeluaran
+                  </option>
+                </select>
+              </div>
+
               <div>
                 <button type="submit" class="btn btn-primary w-full">
                   <i class="fas fa-filter mr-2"></i> Filter
@@ -59,9 +71,7 @@
             </form>
           </div>
 
-          <!-- Sort & Action Buttons -->
           <div class="flex flex-col sm:flex-row gap-3 items-end">
-            <!-- Sort Form -->
             <form method="get" class="flex items-end gap-2">
               <input type="hidden" name="start" th:value="${start}" />
               <input type="hidden" name="end" th:value="${end}" />
@@ -85,7 +95,6 @@
               </div>
             </form>
 
-            <!-- Action Buttons -->
             <div class="flex gap-3">
               <a th:href="@{/transactions/new}" class="btn btn-success">
                 <i class="fas fa-plus mr-2"></i> Tambah
@@ -97,7 +106,6 @@
           </div>
         </div>
 
-        <!-- Tabel Transaksi -->
         <div class="table-container">
           <table>
             <thead>
@@ -160,7 +168,6 @@
                 </td>
               </tr>
 
-              <!-- Jika tidak ada transaksi -->
               <tr th:if="${#lists.isEmpty(transactions)}">
                 <td colspan="6" class="text-center py-16">
                   <i

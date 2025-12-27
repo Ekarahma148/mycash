@@ -9,7 +9,6 @@
   <body>
     <div class="auth-container">
       <div class="auth-card" style="position: relative">
-        <!-- Gradient top bar -->
         <div class="auth-header text-center">
           <h1 style="color: var(--navy-primary); margin-bottom: 0.5rem">
             MyCash
@@ -19,12 +18,10 @@
           </p>
         </div>
 
-        <!-- Error Message -->
         <div th:if="${error}" class="auth-error">
           <span th:text="${error}"></span>
         </div>
 
-        <!-- Login Form -->
         <form method="post" th:action="@{/login}">
           <div class="form-group">
             <label class="form-label" for="username">Username</label>
@@ -63,7 +60,6 @@
           </button>
         </form>
 
-        <!-- Register Link -->
         <div class="auth-links text-center">
           <p style="color: var(--text-light); margin-bottom: 0.5rem">
             Belum punya akun?
@@ -71,7 +67,7 @@
           <a th:href="@{/register}" class="btn btn-outline" style="width: 100%">
             Daftar Sekarang
           </a>
-        </div>       
+        </div>
       </div>
     </div>
   </body>

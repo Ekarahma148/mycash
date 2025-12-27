@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Dashboard - MoneyTracker</title>
+    <title>Dashboard - MyCash</title>
     <link rel="stylesheet" th:href="@{/css/app.css}"/>
-<link rel="stylesheet" th:href="@{/css/fontawesome.css}">
+    <link rel="stylesheet" th:href="@{/css/fontawesome.css}">
 
 </head>
 <body>
@@ -15,7 +15,6 @@
 <main class="content">
     <div class="container">
 
-        <!-- Dashboard Header dengan Tanggal -->
         <div class="dashboard-header">
             <div>
                 <h1>Dashboard Keuangan</h1>
@@ -28,7 +27,6 @@
             </div>
         </div>
 
-        <!-- Statistik Cards -->
         <div class="dashboard">
             <div class="card income">
                 <div>
@@ -37,8 +35,8 @@
                     </div>
                     <h3>Pemasukan</h3>
                     <p class="amount">
-    Rp <span th:text="${#numbers.formatDecimal(totalIn ?: 0, 0, 'COMMA', 0, 'POINT')}">0</span>
-</p>
+                    Rp <span th:text="${#numbers.formatDecimal(totalIn ?: 0, 0, 'COMMA', 0, 'POINT')}">0</span>
+                    </p>
 
                     <div class="card-trend trend-up">
                         <i class="fas fa-caret-up"></i>
@@ -81,8 +79,7 @@
             </div>
         </div>
 
-        <!-- Recent Activity - Sekarang Pakai Data Nyata -->
-<div class="recent-activity">
+    <div class="recent-activity">
     <div class="activity-header">
         <h3>Aktivitas Terbaru</h3>
         <a th:href="@{/transactions}" class="btn btn-outline">
@@ -92,11 +89,9 @@
 
     <div class="activity-list">
 
-        <!-- ADA TRANSAKSI -->
         <div th:if="${transactions != null and !#lists.isEmpty(transactions)}">
             <div th:each="t : ${transactions}" class="activity-item">
 
-                <!-- ICON -->
                 <div class="activity-icon"
                      th:classappend="${t.type.name() == 'IN'} ? 'income' : 'expense'">
                     <i th:class="${t.type.name() == 'IN'}
@@ -104,7 +99,6 @@
                         : 'fas fa-bag-shopping'"></i>
                 </div>
 
-                <!-- DETAIL -->
                 <div class="activity-details">
                     <div class="activity-title"
                          th:text="${t.description ?: 'Transaksi'}">
@@ -116,7 +110,6 @@
                     </div>
                 </div>
 
-                <!-- NOMINAL -->
                 <div class="activity-amount"
                      th:classappend="${t.type.name() == 'OUT'} ? 'text-danger' : ''"
                      th:text="${t.type.name() == 'IN'
@@ -127,7 +120,6 @@
             </div>
         </div>
 
-        <!-- BELUM ADA TRANSAKSI -->
         <div class="activity-item text-center py-8"
              th:unless="${transactions != null and !#lists.isEmpty(transactions)}">
             <i class="fas fa-inbox text-5xl mb-4" style="opacity:0.5"></i>
@@ -142,15 +134,7 @@
 
     </div>
 </main>
-
-<!-- Script Tanggal Indonesia -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const today = new Date().toLocaleDateString('id-ID', options);
-        document.getElementById('current-date').textContent = today;
-    });
-</script>
-
+<span id="current-date"></span>
+<script th:src="@{/js/main.js}"></script>
 </body>
 </html>

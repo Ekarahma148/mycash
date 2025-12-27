@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.project.mycash.models.CashTransaction;
+import com.project.mycash.models.TransactionType;
 import com.project.mycash.models.User;
 
 public interface CashTransactionRepository
@@ -19,6 +20,17 @@ public interface CashTransactionRepository
 
     List<CashTransaction> findByUserAndDateBetween(
             User user,
+            LocalDate start,
+            LocalDate end,
+            Sort sort);
+
+    CashTransaction findFirstByUserAndTypeOrderByDateAsc(
+            User user,
+            TransactionType type);
+
+    List<CashTransaction> findByUserAndTypeAndDateBetween(
+            User user,
+            TransactionType type,
             LocalDate start,
             LocalDate end,
             Sort sort);

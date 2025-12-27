@@ -33,7 +33,7 @@ public class CashTransactionController {
             @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate start,
 
             @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate end,
-
+            @RequestParam(required = false) TransactionType type,
             @RequestParam(defaultValue = "desc") String sort,
 
             HttpSession session,
@@ -46,11 +46,12 @@ public class CashTransactionController {
 
         User user = (User) session.getAttribute("user");
 
-        List<CashTransaction> list = service.findByUserAndPeriod(user, start, end, sort);
+        List<CashTransaction> list = service.findByUserAndPeriod(user, start, end, type, sort);
 
         model.addAttribute("transactions", list);
         model.addAttribute("start", start);
         model.addAttribute("end", end);
+        model.addAttribute("type", type);
         model.addAttribute("sort", sort);
 
         return "transactions/list";

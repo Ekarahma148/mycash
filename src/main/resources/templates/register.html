@@ -9,7 +9,6 @@
   <body>
     <div class="auth-container">
       <div class="auth-card" style="position: relative">
-        <!-- Header -->
         <div class="auth-header text-center">
           <h1 style="color: var(--navy-primary); margin-bottom: 0.5rem">
             MyCash
@@ -19,16 +18,18 @@
           </p>
         </div>
 
-        <!-- Error Message -->
         <div th:if="${error}" class="auth-error">
           <span th:text="${error}"></span>
         </div>
 
-        <div th:if="${success}" class="notification success" style="position: static; margin-bottom: 1.5rem;">
-            <span th:text="${success}"></span>
+        <div
+          th:if="${success}"
+          class="notification success"
+          style="position: static; margin-bottom: 1.5rem"
+        >
+          <span th:text="${success}"></span>
         </div>
 
-        <!-- Register Form -->
         <form method="post" th:action="@{/register}" th:object="${user}">
           <div class="form-group">
             <label class="form-label" for="username">
@@ -71,9 +72,7 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="fullName">
-              Nama Lengkap
-            </label>
+            <label class="form-label" for="fullName"> Nama Lengkap </label>
             <input
               type="text"
               id="fullName"
@@ -95,8 +94,6 @@
             Daftar Sekarang
           </button>
         </form>
-
-        <!-- Login Link -->
         <div class="auth-links text-center">
           <p style="color: var(--text-light); margin-bottom: 0.5rem">
             Sudah punya akun?

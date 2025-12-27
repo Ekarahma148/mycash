@@ -28,4 +28,9 @@ public class CategoryKas {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+    public CategoryKas(String name, String accountName, User user) {
+        this.name = name;
+        this.accountName = accountName;
+        this.user = user;
+    }
 }

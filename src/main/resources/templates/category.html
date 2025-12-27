@@ -3,23 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Manajemen Kategori - MoneyTracker</title>
+    <title>Manajemen Kategori - MyCash</title>
     <link rel="stylesheet" th:href="@{/css/app.css}" />
-    <link rel="stylesheet" th:href="@{/css/fontawesome.css}">
-
+    <link rel="stylesheet" th:href="@{/css/fontawesome.css}" />
   </head>
   <body>
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <main class="content">
       <div class="container">
-        <!-- Judul Halaman -->
         <div class="dashboard-header mb-6">
           <h1 style="font-size: 1.9rem">Manajemen Kategori</h1>
-          
         </div>
-
-        <!-- Form Tambah Kategori -->
         <div class="auth-card" style="max-width: 600px; margin-bottom: 3rem">
           <form
             th:action="@{/categories}"
@@ -27,7 +22,6 @@
             method="post"
             class="p-2"
           >
-            <!-- Nama Kategori -->
             <div class="form-group">
               <label class="form-label">
                 <i
@@ -45,7 +39,6 @@
               />
             </div>
 
-            <!-- Nama Akun Jurnal -->
             <div class="form-group mt-4">
               <label class="form-label">
                 <i
@@ -74,7 +67,6 @@
 
         <hr style="border-color: var(--border-color); margin: 3rem 0" />
 
-        <!-- Daftar Kategori -->
         <h2
           style="
             font-size: 1.5rem;
@@ -98,7 +90,6 @@
                 <td th:text="${c.name}">Kategori</td>
               </tr>
 
-              <!-- Jika tidak ada kategori -->
               <tr th:if="${#lists.isEmpty(categories)}">
                 <td
                   colspan="2"

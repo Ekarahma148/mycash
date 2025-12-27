@@ -619,6 +619,7 @@ p {
     background: transparent;
     border: 2px solid var(--navy-primary);
     color: var(--navy-primary);
+    
 }
 
 .btn-outline:hover {

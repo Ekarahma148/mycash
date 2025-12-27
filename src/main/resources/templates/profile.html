@@ -15,15 +15,12 @@
 <main class="content">
     <div class="container">
 
-        <!-- Header Profil -->
         <div class="dashboard-header  mb-10">
             <h1 class="text-3xl font-bold">Pengaturan Profil</h1>  
         </div>
 
-        <!-- Card Utama -->
         <div class="auth-card" style="max-width: 800px; margin: 0 auto; padding: 3rem;">
 
-            <!-- Notifikasi -->
             <div th:if="${param.success}" class="notification success mb-8">
                 <i class="fas fa-check-circle mr-3"></i>
                 Profil berhasil diperbarui!
@@ -33,12 +30,10 @@
                 <span th:text="${error}"></span>
             </div>
 
-            <!-- Form Profil -->
             <form th:action="@{/profile/update}" th:object="${user}" method="post" class="space-y-8">
 
                 <input type="hidden" th:field="*{id}"/>
 
-                <!-- Info Dasar -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-group">
                         <label class="form-label">
@@ -86,7 +81,6 @@
                     </div>
                 </div>
 
-                <!-- Info Tambahan -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-group">
                         <label class="form-label">
@@ -100,7 +94,6 @@
                         </select>
                     </div>
 
-                <!-- Alamat -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-group md:col-span-2">
                         <label class="form-label">
@@ -135,9 +128,6 @@
                                placeholder="Karyawan, Mahasiswa, Freelancer, dll"/>
                     </div>
                 </div>
-
-
-                <!-- Tombol Simpan -->
                 <div class="mt-10 text-center">
                     <button type="submit" class="btn btn-primary px-10 py-4 text-lg font-semibold">
                         <i class="fas fa-save mr-3"></i>

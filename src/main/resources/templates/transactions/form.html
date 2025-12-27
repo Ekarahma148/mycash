@@ -9,18 +9,13 @@
       Form Transaksi
     </title>
     <link rel="stylesheet" th:href="@{/css/app.css}" />
-    <link rel="stylesheet" th:href="@{/css/fontawesome.css}">
-
+    <link rel="stylesheet" th:href="@{/css/fontawesome.css}" />
   </head>
   <body>
-    <!-- SIDEBAR -->
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-    <!-- CONTENT -->
     <main class="content">
       <div class="container">
-
-        <!-- Judul Form -->
         <div class="dashboard-header mb-6">
           <h1
             style="font-size: 1.9rem; margin-bottom: 0.5rem"
@@ -28,12 +23,8 @@
           >
             Tambah Transaksi
           </h1>
-          <p style="color: var(--text-light)">
-            Isi detail transaksi dengan lengkap
-          </p>
         </div>
 
-        <!-- Form Transaksi -->
         <div
           class="auth-card"
           style="max-width: 700px; margin: 0 auto; padding: 2.5rem"
@@ -46,7 +37,6 @@
           >
             <input type="hidden" th:field="*{id}" />
 
-            <!-- Tanggal -->
             <div class="form-group">
               <label class="form-label">
                 <i
@@ -63,7 +53,6 @@
               />
             </div>
 
-            <!-- Tipe -->
             <div class="form-group">
               <label class="form-label">
                 <i
@@ -79,7 +68,6 @@
               </select>
             </div>
 
-            <!-- Jumlah -->
             <div class="form-group">
               <label class="form-label">
                 <i
@@ -105,8 +93,6 @@
               </span>
             </div>
 
-            <!-- Deskripsi -->
-            <!-- Keterangan -->
             <div class="form-group">
               <label class="form-label">
                 <i
@@ -156,11 +142,10 @@
                 Kategori wajib dipilih
               </span>
             </div>
-<div th:if="${error}" class="alert alert-danger mb-4">
-          <i class="fas fa-exclamation-circle"></i>
-          <span th:text="${error}"></span>
-        </div>
-            <!-- Tombol Aksi -->
+            <div th:if="${error}" class="alert alert-danger mb-4">
+              <i class="fas fa-exclamation-circle"></i>
+              <span th:text="${error}"></span>
+            </div>
             <div class="flex gap-3 mt-6">
               <button type="submit" class="btn btn-primary flex-1">
                 <i class="fas fa-save mr-2"></i>

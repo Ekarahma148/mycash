@@ -3,23 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Riwayat Aktivitas - MyCash</title>
+    <title>Riwayat Transaksi - MyCash</title>
     <link rel="stylesheet" th:href="@{/css/app.css}" />
-    <link rel="stylesheet" th:href="@{/css/fontawesome.css}">
-
+    <link rel="stylesheet" th:href="@{/css/fontawesome.css}" />
   </head>
   <body>
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <main class="content">
       <div class="container">
-        <!-- Judul Halaman -->
         <div class="dashboard-header mb-6">
-          <h1 style="font-size: 1.9rem">Riwayat Aktivitas</h1>
-         
+          <h1 style="font-size: 1.9rem">Riwayat Transaksi</h1>
         </div>
 
-        <!-- Form Pencarian -->
         <div class="search-container mb-6">
           <form
             method="get"
@@ -27,13 +23,6 @@
             class="flex gap-3 items-end"
           >
             <div class="form-group flex-1">
-              <label class="form-label">
-                <i
-                  class="fas fa-search mr-2"
-                  style="color: var(--navy-primary)"
-                ></i>
-                Cari Aktivitas
-              </label>
               <input
                 type="text"
                 name="keyword"
@@ -53,7 +42,6 @@
           </form>
         </div>
 
-        <!-- Tabel History -->
         <div class="table-container">
           <table style="font-size: 0.95rem">
             <thead>
@@ -78,7 +66,6 @@
                 <td th:text="${log.description}">Deskripsi log</td>
               </tr>
 
-              <!-- Jika tidak ada data -->
               <tr th:if="${#lists.isEmpty(logs)}">
                 <td
                   colspan="3"

@@ -5,23 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jurnal Umum - MyCash</title>
     <link rel="stylesheet" th:href="@{/css/app.css}" />
-    <link rel="stylesheet" th:href="@{/css/fontawesome.css}">
-
+    <link rel="stylesheet" th:href="@{/css/fontawesome.css}" />
   </head>
   <body>
-    <!-- SIDEBAR -->
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-    <!-- CONTENT -->
     <main class="content">
       <div class="container">
-        <!-- Judul Halaman -->
         <div class="dashboard-header mb-8">
           <h1 style="font-size: 2rem">Jurnal Umum</h1>
-          
         </div>
 
-        <!-- Tabel Jurnal -->
         <div class="table-container">
           <table style="font-size: 0.95rem">
             <thead>
@@ -66,7 +60,6 @@
                 </td>
               </tr>
 
-              <!-- Jika tidak ada data -->
               <tr th:if="${#lists.isEmpty(journals)}">
                 <td
                   colspan="5"

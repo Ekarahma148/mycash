@@ -34,6 +34,27 @@ public class CashTransactionService {
     public CashTransaction save(CashTransaction tx) {
 
         boolean isNew = (tx.getId() == null);
+        // CEK JUMLAH TRANSAKSI USER
+        boolean isFirstTransaction = repo.findByUser(tx.getUser()).isEmpty();
+
+        if (isFirstTransaction && tx.getType() == TransactionType.OUT) {
+            throw new RuntimeException(
+                    "Transaksi pertama harus berupa pemasukan");
+        }
+        // CEK TANGGAL PEMASUKAN PERTAMA
+        CashTransaction firstIncome = repo.findFirstByUserAndTypeOrderByDateAsc(
+                tx.getUser(),
+                TransactionType.IN);
+
+        // 🔒 Pengeluaran tidak boleh sebelum pemasukan pertama
+        if (firstIncome != null &&
+                tx.getType() == TransactionType.OUT &&
+                tx.getDate().isBefore(firstIncome.getDate())) {
+
+            throw new RuntimeException(
+                    "Pengeluaran tidak boleh lebih awal dari pemasukan pertama (" +
+                            firstIncome.getDate() + ")");
+        }
 
         if (tx.getCategory() == null || tx.getCategory().getId() == null) {
             throw new RuntimeException("Kategori wajib dipilih");
@@ -138,6 +159,7 @@ public class CashTransactionService {
             User user,
             LocalDate start,
             LocalDate end,
+            TransactionType type,
             String sortDir) {
 
         Sort sort = Sort.by("date");
@@ -147,8 +169,12 @@ public class CashTransactionService {
         } else {
             sort = sort.descending(); // default
         }
-
-        return repo.findByUserAndDateBetween(user, start, end, sort);
+        if (type != null) {
+            return repo.findByUserAndTypeAndDateBetween(
+                    user, type, start, end, sort);
+        }
+        return repo.findByUserAndDateBetween(
+                user, start, end, sort);
     }
 
     public CashTransaction findById(Long id) {
