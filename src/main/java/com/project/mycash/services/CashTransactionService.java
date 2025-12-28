@@ -36,17 +36,19 @@ public class CashTransactionService {
         boolean isNew = (tx.getId() == null);
         // CEK JUMLAH TRANSAKSI USER
         boolean isFirstTransaction = repo.findByUser(tx.getUser()).isEmpty();
-
+        if (!isNew && tx.getDate() == null) {
+            CashTransaction oldTx = repo.findById(tx.getId())
+                    .orElseThrow(() -> new RuntimeException("Transaksi tidak ditemukan"));
+            tx.setDate(oldTx.getDate());
+        }
         if (isFirstTransaction && tx.getType() == TransactionType.OUT) {
             throw new RuntimeException(
                     "Transaksi pertama harus berupa pemasukan");
         }
-        // CEK TANGGAL PEMASUKAN PERTAMA
         CashTransaction firstIncome = repo.findFirstByUserAndTypeOrderByDateAsc(
                 tx.getUser(),
                 TransactionType.IN);
 
-        // 🔒 Pengeluaran tidak boleh sebelum pemasukan pertama
         if (firstIncome != null &&
                 tx.getType() == TransactionType.OUT &&
                 tx.getDate().isBefore(firstIncome.getDate())) {

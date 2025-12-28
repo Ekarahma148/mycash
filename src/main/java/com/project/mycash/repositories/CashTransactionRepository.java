@@ -53,4 +53,5 @@ public interface CashTransactionRepository
                 WHERE t.user = :user
             """)
     BigDecimal getSaldoUser(@Param("user") User user);
+    
 }
