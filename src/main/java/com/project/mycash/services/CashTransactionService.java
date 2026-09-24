@@ -37,10 +37,17 @@ public class CashTransactionService {
         // CEK JUMLAH TRANSAKSI USER
         boolean isFirstTransaction = repo.findByUser(tx.getUser()).isEmpty();
         if (!isNew && tx.getDate() == null) {
-            CashTransaction oldTx = repo.findById(tx.getId())
-                    .orElseThrow(() -> new RuntimeException("Transaksi tidak ditemukan"));
-            tx.setDate(oldTx.getDate());
-        }
+    CashTransaction oldTx = repo.findByIdAndUser(
+            tx.getId(),
+            tx.getUser())
+            ;
+
+    if (oldTx == null) {
+        throw new RuntimeException("Transaksi tidak ditemukan");
+    }
+
+    tx.setDate(oldTx.getDate());
+}
         if (isFirstTransaction && tx.getType() == TransactionType.OUT) {
             throw new RuntimeException(
                     "Transaksi pertama harus berupa pemasukan");
@@ -63,9 +70,13 @@ public class CashTransactionService {
         }
 
         // 🔥 AMBIL KATEGORI ASLI
-        CategoryKas category = categoryRepo.findById(tx.getCategory().getId())
-                .orElseThrow(() -> new RuntimeException("Kategori tidak ditemukan"));
+       CategoryKas category = categoryRepo.findByIdAndUser(
+        tx.getCategory().getId(),
+        tx.getUser());
 
+if (category == null) {
+    throw new RuntimeException("Kategori tidak ditemukan");
+}
         if (category.getAccountName() == null || category.getAccountName().isBlank()) {
             throw new RuntimeException("Kategori belum memiliki akun jurnal");
         }
@@ -79,12 +90,15 @@ public class CashTransactionService {
 
             BigDecimal saldo = repo.getSaldoUser(tx.getUser());
 
-            if (!isNew) {
-                CashTransaction old = repo.findById(tx.getId()).orElse(null);
-                if (old != null && old.getType() == TransactionType.OUT) {
-                    saldo = saldo.add(old.getAmount());
-                }
-            }
+           if (!isNew) {
+    CashTransaction old = repo.findByIdAndUser(
+            tx.getId(),
+            tx.getUser());
+
+    if (old != null && old.getType() == TransactionType.OUT) {
+        saldo = saldo.add(old.getAmount());
+    }
+}
 
             if (tx.getAmount().compareTo(saldo) > 0) {
                 throw new RuntimeException(
@@ -135,27 +149,30 @@ public class CashTransactionService {
         return saved;
     }
 
-    public void delete(Long id) {
-        CashTransaction tx = repo.findById(id).orElse(null);
-        if (tx == null)
-            return;
+    public void delete(Long id, User user) {
 
-        journalRepo.deleteByTransactionId(id);
-        repo.deleteById(id);
+    CashTransaction tx = repo.findByIdAndUser(id, user);
 
-        String tipe = tx.getType() == TransactionType.IN
-                ? "pemasukan"
-                : "pengeluaran";
-
-        String nominal = formatRupiah(tx.getAmount());
-
-        logService.log(
-                tx.getUser(),
-                "DELETE",
-                "Menghapus " + tipe +
-                        " " + tx.getDescription() +
-                        " sebesar " + nominal);
+    if (tx == null) {
+        throw new RuntimeException("Transaksi tidak ditemukan");
     }
+
+    journalRepo.deleteByTransactionId(id);
+    repo.deleteById(id);
+
+    String tipe = tx.getType() == TransactionType.IN
+            ? "pemasukan"
+            : "pengeluaran";
+
+    String nominal = formatRupiah(tx.getAmount());
+
+    logService.log(
+            tx.getUser(),
+            "DELETE",
+            "Menghapus " + tipe +
+                    " " + tx.getDescription() +
+                    " sebesar " + nominal);
+}
 
     public List<CashTransaction> findByUserAndPeriod(
             User user,
@@ -179,9 +196,15 @@ public class CashTransactionService {
                 user, start, end, sort);
     }
 
-    public CashTransaction findById(Long id) {
-        return repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transaksi tidak ditemukan"));
+   public CashTransaction findById(Long id, User user) {
+
+    CashTransaction tx = repo.findByIdAndUser(id, user);
+
+    if (tx == null) {
+        throw new RuntimeException("Transaksi tidak ditemukan");
     }
+
+    return tx;
+}
 
 }

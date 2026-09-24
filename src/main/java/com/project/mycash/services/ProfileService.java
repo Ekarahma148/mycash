@@ -16,19 +16,21 @@ public class ProfileService {
         return userRepo.findById(id).orElse(null);
     }
 
-    @Transactional
-    public void updateProfile(User updatedUser) {
-        User user = userRepo.findById(updatedUser.getId()).orElseThrow();
+   @Transactional
+public void updateProfile(User updatedUser, User sessionUser) {
 
-        user.setFullName(updatedUser.getFullName());
-        user.setEmail(updatedUser.getEmail());
-        user.setPhone(updatedUser.getPhone());
-        user.setGender(updatedUser.getGender());
-        user.setDateOfBirth(updatedUser.getDateOfBirth());
-        user.setAddress(updatedUser.getAddress());
-        user.setCity(updatedUser.getCity());
-        user.setOccupation(updatedUser.getOccupation());
+    User user = userRepo.findById(sessionUser.getId())
+            .orElseThrow(() -> new RuntimeException("User tidak ditemukan"));
 
-        userRepo.save(user);
-    }
+    user.setFullName(updatedUser.getFullName());
+    user.setEmail(updatedUser.getEmail());
+    user.setPhone(updatedUser.getPhone());
+    user.setGender(updatedUser.getGender());
+    user.setDateOfBirth(updatedUser.getDateOfBirth());
+    user.setAddress(updatedUser.getAddress());
+    user.setCity(updatedUser.getCity());
+    user.setOccupation(updatedUser.getOccupation());
+
+    userRepo.save(user);
+}
 }

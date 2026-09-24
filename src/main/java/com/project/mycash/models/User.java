@@ -66,8 +66,8 @@ public class User {
             createdAt = LocalDateTime.now();
 
         // FIELD OPSIONAL → JANGAN NULL
-        if (email == null)
-            email = "";
+       if (email != null && email.isBlank())
+    email = null;
         if (phone == null)
             phone = "";
         if (gender == null)

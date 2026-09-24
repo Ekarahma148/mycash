@@ -44,7 +44,13 @@ public class ProfileController {
             return "profile";
         }
 
-        profileService.updateProfile(user);
+        User sessionUser = (User) session.getAttribute("user");
+
+if (sessionUser == null) {
+    return "redirect:/login";
+}
+
+profileService.updateProfile(user, sessionUser);
 
         // update session
         session.setAttribute("user", user);

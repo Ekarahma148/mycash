@@ -31,7 +31,6 @@ public class CashTransactionController {
     @GetMapping("/transactions")
     public String list(
             @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate start,
-
             @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate end,
             @RequestParam(required = false) TransactionType type,
             @RequestParam(defaultValue = "desc") String sort,
@@ -115,7 +114,7 @@ public class CashTransactionController {
 
         User user = (User) session.getAttribute("user");
 
-        CashTransaction tx = service.findById(id);
+        CashTransaction tx = service.findById(id, user);
 
         model.addAttribute("transaction", tx);
         model.addAttribute("types", TransactionType.values());
@@ -126,16 +125,18 @@ public class CashTransactionController {
     }
 
     /* ================= DELETE ================= */
-    @GetMapping("/transactions/delete/{id}")
-    public String delete(@PathVariable Long id) {
-        service.delete(id);
-        return "redirect:/transactions";
-    }
+    @PostMapping("/transactions/delete/{id}")
+public String delete(@PathVariable Long id, HttpSession session) {
+    User user = (User) session.getAttribute("user");
+    service.delete(id, user);
+    return "redirect:/transactions";
+}
 
     /* ================= CONFIRM DELETE ================= */
     @GetMapping("/transactions/confirm-delete/{id}")
-    public String confirmDelete(@PathVariable Long id, Model model) {
-        CashTransaction tx = service.findById(id);
+    public String confirmDelete(@PathVariable Long id, Model model, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        CashTransaction tx = service.findById(id, user);
         model.addAttribute("transaction", tx);
         return "transactions/confirm-delete";
     }

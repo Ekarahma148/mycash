@@ -108,15 +108,21 @@
               Batal
             </a>
 
-            <a
-              th:href="@{'/transactions/delete/' + ${transaction.id}}"
-              class="btn btn-danger flex-1"
-              style="padding: 1rem"
-              onclick="return confirm('Transaksi ini akan dihapus secara permanen. Lanjutkan?')"
-            >
-              <i class="fas fa-trash mr-3"></i>
-              Ya, Hapus Permanen
-            </a>
+            <form
+  th:action="@{/transactions/delete/{id}(id=${transaction.id})}"
+  method="post"
+  class="flex-1"
+  onsubmit="return confirm('Transaksi ini akan dihapus secara permanen. Lanjutkan?')"
+>
+  <button
+    type="submit"
+    class="btn btn-danger w-full"
+    style="padding: 1rem"
+  >
+    <i class="fas fa-trash mr-3"></i>
+    Ya, Hapus Permanen
+  </button>
+</form>
           </div>
         </div>
       </div>

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.project.mycash.models.CategoryKas;
 import com.project.mycash.models.User;
 import com.project.mycash.repositories.CategoryKasRepository;
@@ -17,9 +17,10 @@ public class AuthService {
 
     private final UserRepository userRepo;
     private final CategoryKasRepository categoryRepo;
+     private final PasswordEncoder passwordEncoder;
 
     public User register(User user) {
-
+user.setPassword(passwordEncoder.encode(user.getPassword()));
         // 🔥 SET DEFAULT VALUE
         user.setRole("USER");
         user.setActive(true);
@@ -45,15 +46,18 @@ public class AuthService {
         return userRepo.existsByUsername(username);
     }
 
-    public User login(String username, String password) {
-        User user = userRepo.findByUsername(username).orElse(null);
+   public User login(String username, String password) {
+    User user = userRepo.findByUsername(username).orElse(null);
 
-        if (user != null && user.getPassword().equals(password)) {
-            // update last login
-            user.setLastLogin(LocalDateTime.now());
-            userRepo.save(user);
-            return user;
-        }
-        return null;
+    if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+
+        // update last login
+        user.setLastLogin(LocalDateTime.now());
+        userRepo.save(user);
+
+        return user;
     }
+
+    return null;
+}
 }

@@ -49,8 +49,8 @@ public class AuthController {
             return "register";
         }
 
-        if (user.getPassword().length() > 6) {
-            model.addAttribute("error", "Password maksimal 6 karakter");
+        if (user.getPassword().length() < 8) {
+            model.addAttribute("error", "Password minimal 8 karakter");
             model.addAttribute("user", user);
             return "register";
         }

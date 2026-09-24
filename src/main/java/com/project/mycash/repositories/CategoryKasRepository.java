@@ -8,5 +8,8 @@ import com.project.mycash.models.CategoryKas;
 import com.project.mycash.models.User;
 
 public interface CategoryKasRepository extends JpaRepository<CategoryKas, Long> {
+
     List<CategoryKas> findByUser(User user);
+
+    CategoryKas findByIdAndUser(Long id, User user);
 }

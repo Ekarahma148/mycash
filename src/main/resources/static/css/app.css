@@ -462,7 +462,22 @@ p {
     font-size: 1.1rem;
     border: 2px dashed var(--border-color);
 }
+.dashboard-analytics {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
 
+.chart-card {
+    min-width: 0;
+}
+
+@media (max-width: 900px) {
+    .dashboard-analytics {
+        grid-template-columns: 1fr;
+    }
+}
 /* =========================
    RECENT ACTIVITY
 ========================= */

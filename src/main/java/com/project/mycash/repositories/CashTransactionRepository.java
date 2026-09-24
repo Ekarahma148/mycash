@@ -18,6 +18,8 @@ public interface CashTransactionRepository
 
     List<CashTransaction> findByUser(User user);
 
+    CashTransaction findByIdAndUser(Long id, User user);
+
     List<CashTransaction> findByUserAndDateBetween(
             User user,
             LocalDate start,
@@ -41,17 +43,54 @@ public interface CashTransactionRepository
             Sort sort);
 
     @Query("""
-                SELECT COALESCE(
-                    SUM(
-                        CASE
-                            WHEN t.type = 'IN' THEN t.amount
-                            ELSE -t.amount
-                        END
-                    ), 0
-                )
-                FROM CashTransaction t
-                WHERE t.user = :user
+            SELECT COALESCE(
+                SUM(
+                    CASE
+                        WHEN t.type = 'IN' THEN t.amount
+                        ELSE -t.amount
+                    END
+                ), 0
+            )
+            FROM CashTransaction t
+            WHERE t.user = :user
             """)
     BigDecimal getSaldoUser(@Param("user") User user);
-    
+
+    // ==========================================
+    // ANALYTICS - PEMASUKAN & PENGELUARAN BULANAN
+    // ==========================================
+
+    @Query("""
+            SELECT
+                MONTH(t.date),
+                t.type,
+                COALESCE(SUM(t.amount), 0)
+            FROM CashTransaction t
+            WHERE t.user = :user
+              AND YEAR(t.date) = :year
+            GROUP BY MONTH(t.date), t.type
+            ORDER BY MONTH(t.date)
+            """)
+    List<Object[]> getMonthlySummary(
+            @Param("user") User user,
+            @Param("year") int year);
+
+    // ==========================================
+    // ANALYTICS - PENGELUARAN PER KATEGORI
+    // ==========================================
+
+    @Query("""
+            SELECT
+                t.category.name,
+                COALESCE(SUM(t.amount), 0)
+            FROM CashTransaction t
+            WHERE t.user = :user
+              AND t.type = 'OUT'
+              AND YEAR(t.date) = :year
+            GROUP BY t.category.name
+            ORDER BY SUM(t.amount) DESC
+            """)
+    List<Object[]> getExpenseByCategory(
+            @Param("user") User user,
+            @Param("year") int year);
 }
