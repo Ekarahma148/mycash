@@ -1,0 +1,151 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Manajemen Kategori - MyCash</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}" />
+
+    <link rel="stylesheet" th:href="@{/css/fontawesome.css}" />
+  </head>
+
+  <body>
+    <!-- SIDEBAR -->
+
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- CONTENT -->
+
+    <main class="content">
+      <div class="container">
+        <!-- HEADER -->
+
+        <div class="dashboard-header mb-6">
+          <div>
+            <h1 style="font-size: 1.9rem">Manajemen Kategori</h1>
+
+            <p style="color: var(--text-light); margin-top: 6px"></p>
+          </div>
+
+          <a th:href="@{/categories/add}" class="btn btn-primary">
+            <i class="fas fa-plus mr-2"></i>
+
+            Tambah Kategori
+          </a>
+        </div>
+
+        <!-- CATEGORY TABLE -->
+
+        <div class="table-container">
+          <table style="font-size: 0.95rem">
+            <thead>
+              <tr>
+                <th>ID</th>
+
+                <th>Nama Kategori</th>
+
+                <th>Akun Jurnal</th>
+
+                <th style="text-align: center">Aksi</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <!-- DATA -->
+
+              <tr th:each="c : ${categories}">
+                <td th:text="${c.id}">1</td>
+
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px">
+                    <div
+                      style="
+                        width: 38px;
+                        height: 38px;
+                        border-radius: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: #eff6ff;
+                        color: #2563eb;
+                      "
+                    >
+                      <i class="fas fa-tag"></i>
+                    </div>
+
+                    <strong th:text="${c.name}"> Kategori </strong>
+                  </div>
+                </td>
+
+                <td th:text="${c.accountName}">Beban Makanan</td>
+
+                <!-- ACTION -->
+
+                <td>
+                  <div style="display: flex; justify-content: center; gap: 8px">
+                    <!-- EDIT -->
+
+                    <a
+                      th:href="@{/categories/edit/{id}(id=${c.id})}"
+                      class="btn btn-outline btn-sm"
+                      title="Edit kategori"
+                    >
+                      <i class="fas fa-edit"></i>
+                    </a>
+
+                    <!-- DELETE -->
+
+                    <form
+                      th:action="@{/categories/delete/{id}(id=${c.id})}"
+                      method="post"
+                      style="margin: 0"
+                      onsubmit="
+                        return confirm('Yakin ingin menghapus kategori ini?');
+                      "
+                    >
+                      <button
+                        type="submit"
+                        class="btn btn-danger btn-sm"
+                        title="Hapus kategori"
+                      >
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- EMPTY -->
+
+              <tr th:if="${categories == null or #lists.isEmpty(categories)}">
+                <td
+                  colspan="4"
+                  class="text-center py-8"
+                  style="color: var(--text-light)"
+                >
+                  <i
+                    class="fas fa-tags text-4xl mb-4 block"
+                    style="opacity: 0.5"
+                  >
+                  </i>
+
+                  <div>Belum ada kategori</div>
+
+                  <div class="text-sm mt-1">
+                    Tambahkan kategori pertama menggunakan tombol "Tambah
+                    Kategori".
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <script th:src="@{/js/main.js}"></script>
+  </body>
+</html>

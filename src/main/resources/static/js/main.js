@@ -13,3 +13,13 @@ document.addEventListener("DOMContentLoaded", function () {
         dateElement.textContent = today;
     }
 });
+function toggleSidebar() {
+
+    const sidebar = document.querySelector(".sidebar");
+
+    if (!sidebar) {
+        return;
+    }
+
+    sidebar.classList.toggle("mobile-open");
+}

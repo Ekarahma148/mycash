@@ -1,91 +1,677 @@
-<!DOCTYPE html>
+<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" lang="id">
   <head>
     <meta charset="UTF-8" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Riwayat Transaksi - MyCash</title>
+
     <link rel="stylesheet" th:href="@{/css/app.css}" />
+
     <link rel="stylesheet" th:href="@{/css/fontawesome.css}" />
+
+    <style>
+      /* =========================================================
+           HISTORY PAGE
+        ========================================================= */
+
+      .history-page {
+        width: 100%;
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 32px;
+        box-sizing: border-box;
+      }
+
+      /* =========================================================
+           HEADER
+        ========================================================= */
+
+      .history-header {
+        margin-bottom: 24px;
+      }
+
+      .history-header h1 {
+        margin: 0;
+        color: #111827;
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .history-header p {
+        margin: 7px 0 0;
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      /* =========================================================
+           SEARCH
+        ========================================================= */
+
+      .history-search {
+        background: white;
+
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+
+        padding: 20px;
+
+        margin-bottom: 24px;
+
+        box-shadow: 0 8px 25px rgba(15, 23, 42, 0.04);
+      }
+
+      .history-search-form {
+        display: grid;
+
+        grid-template-columns: minmax(0, 1fr) auto auto;
+
+        gap: 12px;
+
+        align-items: end;
+      }
+
+      .history-search-group {
+        min-width: 0;
+      }
+
+      .history-search-label {
+        display: block;
+
+        margin-bottom: 7px;
+
+        color: #374151;
+
+        font-size: 13px;
+
+        font-weight: 600;
+      }
+
+      .history-search-input {
+        width: 100%;
+
+        box-sizing: border-box;
+
+        padding: 12px 14px;
+
+        border: 1px solid #d1d5db;
+
+        border-radius: 10px;
+
+        background: white;
+
+        color: #111827;
+
+        font-size: 14px;
+
+        outline: none;
+
+        transition: 0.2s ease;
+      }
+
+      .history-search-input:focus {
+        border-color: #2563eb;
+
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+
+      /* =========================================================
+           BUTTON
+        ========================================================= */
+
+      .history-button {
+        height: 43px;
+
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 7px;
+
+        padding: 0 16px;
+
+        border-radius: 10px;
+
+        border: none;
+
+        text-decoration: none;
+
+        font-size: 13px;
+
+        font-weight: 600;
+
+        cursor: pointer;
+
+        white-space: nowrap;
+
+        box-sizing: border-box;
+
+        transition: 0.2s ease;
+      }
+
+      .history-button-primary {
+        background: #2563eb;
+        color: white;
+      }
+
+      .history-button-primary:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+      }
+
+      .history-button-outline {
+        background: #f8fafc;
+
+        color: #374151;
+
+        border: 1px solid #d1d5db;
+      }
+
+      .history-button-outline:hover {
+        background: #f1f5f9;
+      }
+
+      /* =========================================================
+           TABLE CARD
+        ========================================================= */
+
+      .history-table-card {
+        background: white;
+
+        border: 1px solid #e5e7eb;
+
+        border-radius: 18px;
+
+        overflow: hidden;
+
+        box-shadow: 0 8px 25px rgba(15, 23, 42, 0.04);
+      }
+
+      .history-table-wrapper {
+        width: 100%;
+
+        overflow-x: auto;
+      }
+
+      .history-table {
+        width: 100%;
+
+        border-collapse: collapse;
+
+        font-size: 14px;
+      }
+
+      .history-table thead {
+        background: #f8fafc;
+      }
+
+      .history-table th {
+        padding: 15px 18px;
+
+        color: #475569;
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        text-align: left;
+
+        text-transform: uppercase;
+
+        letter-spacing: 0.03em;
+
+        border-bottom: 1px solid #e5e7eb;
+
+        white-space: nowrap;
+      }
+
+      .history-table td {
+        padding: 16px 18px;
+
+        color: #475569;
+
+        border-bottom: 1px solid #f1f5f9;
+
+        vertical-align: middle;
+      }
+
+      .history-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .history-table tbody tr {
+        transition: background 0.2s ease;
+      }
+
+      .history-table tbody tr:hover {
+        background: #f8fafc;
+      }
+
+      /* =========================================================
+           DATE
+        ========================================================= */
+
+      .history-date {
+        color: #64748b;
+
+        white-space: nowrap;
+
+        font-size: 13px;
+      }
+
+      .history-date i {
+        margin-right: 6px;
+
+        color: #94a3b8;
+      }
+
+      /* =========================================================
+           ACTION BADGE
+        ========================================================= */
+
+      .history-action {
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        padding: 5px 9px;
+
+        border-radius: 7px;
+
+        background: #eff6ff;
+
+        color: #2563eb;
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        letter-spacing: 0.02em;
+      }
+
+      /* =========================================================
+           DESCRIPTION
+        ========================================================= */
+
+      .history-description {
+        color: #374151;
+
+        line-height: 1.5;
+      }
+
+      /* =========================================================
+           EMPTY STATE
+        ========================================================= */
+
+      .history-empty {
+        min-height: 280px;
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+
+        justify-content: center;
+
+        padding: 40px 20px;
+
+        text-align: center;
+      }
+
+      .history-empty-icon {
+        width: 68px;
+        height: 68px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        margin-bottom: 16px;
+
+        border-radius: 18px;
+
+        background: #f8fafc;
+
+        color: #94a3b8;
+
+        font-size: 28px;
+      }
+
+      .history-empty-title {
+        margin: 0;
+
+        color: #374151;
+
+        font-size: 17px;
+
+        font-weight: 700;
+      }
+
+      .history-empty-text {
+        margin: 7px 0 0;
+
+        color: #94a3b8;
+
+        font-size: 13px;
+
+        line-height: 1.5;
+      }
+
+      /* =========================================================
+           TABLET
+        ========================================================= */
+
+      @media (max-width: 900px) {
+        .history-page {
+          padding: 24px;
+        }
+
+        .history-search-form {
+          grid-template-columns: 1fr auto auto;
+        }
+      }
+
+      /* =========================================================
+           MOBILE
+        ========================================================= */
+
+      @media (max-width: 768px) {
+        .history-page {
+          padding: 18px;
+        }
+
+        .history-header h1 {
+          font-size: 25px;
+        }
+
+        .history-search {
+          padding: 16px;
+        }
+
+        .history-search-form {
+          grid-template-columns: 1fr;
+        }
+
+        .history-button {
+          width: 100%;
+        }
+
+        /*
+               TABLE MENJADI CARD
+            */
+
+        .history-table-wrapper {
+          overflow: visible;
+        }
+
+        .history-table {
+          display: block;
+        }
+
+        .history-table thead {
+          display: none;
+        }
+
+        .history-table tbody {
+          display: block;
+        }
+
+        .history-table tr {
+          display: block;
+
+          padding: 17px;
+
+          border-bottom: 1px solid #e5e7eb;
+        }
+
+        .history-table tr:last-child {
+          border-bottom: none;
+        }
+
+        .history-table tbody tr:hover {
+          background: white;
+        }
+
+        .history-table td {
+          display: flex;
+
+          align-items: flex-start;
+
+          justify-content: space-between;
+
+          gap: 16px;
+
+          padding: 9px 0;
+
+          border: none;
+
+          font-size: 13px;
+
+          text-align: right;
+        }
+
+        .history-table td::before {
+          content: attr(data-label);
+
+          flex-shrink: 0;
+
+          color: #94a3b8;
+
+          font-size: 11px;
+
+          font-weight: 700;
+
+          text-transform: uppercase;
+
+          text-align: left;
+
+          letter-spacing: 0.03em;
+        }
+
+        .history-description {
+          max-width: 65%;
+
+          text-align: right;
+
+          overflow-wrap: anywhere;
+        }
+
+        .history-action {
+          flex-shrink: 0;
+        }
+      }
+
+      /* =========================================================
+           SMALL MOBILE
+        ========================================================= */
+
+      @media (max-width: 480px) {
+        .history-page {
+          padding: 14px;
+        }
+
+        .history-header {
+          margin-bottom: 18px;
+        }
+
+        .history-header h1 {
+          font-size: 23px;
+        }
+
+        .history-header p {
+          font-size: 13px;
+        }
+
+        .history-search {
+          padding: 14px;
+
+          border-radius: 14px;
+        }
+
+        .history-table-card {
+          border-radius: 14px;
+        }
+
+        .history-table tr {
+          padding: 15px;
+        }
+
+        .history-table td {
+          flex-direction: column;
+
+          align-items: flex-start;
+
+          gap: 4px;
+
+          text-align: left;
+        }
+
+        .history-table td::before {
+          font-size: 10px;
+        }
+
+        .history-description {
+          max-width: 100%;
+
+          text-align: left;
+        }
+      }
+    </style>
   </head>
+
   <body>
+    <!-- SIDEBAR -->
+
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
+    <!-- CONTENT -->
+
     <main class="content">
-      <div class="container">
-        <div class="dashboard-header mb-6">
-          <h1 style="font-size: 1.9rem">Riwayat Transaksi</h1>
+      <div class="history-page">
+        <!-- HEADER -->
+
+        <div class="history-header">
+          <h1>Riwayat Transaksi</h1>
         </div>
 
-        <div class="search-container mb-6">
+        <!-- SEARCH -->
+
+        <div class="history-search">
           <form
             method="get"
             th:action="@{/history}"
-            class="flex gap-3 items-end"
+            class="history-search-form"
           >
-            <div class="form-group flex-1">
+            <div class="history-search-group">
+              <label for="keyword" class="history-search-label">
+                Cari aktivitas
+              </label>
+
               <input
+                id="keyword"
                 type="text"
                 name="keyword"
                 placeholder="Kata kunci aksi atau keterangan..."
                 th:value="${keyword}"
-                class="form-control"
+                class="history-search-input"
               />
             </div>
-            <div>
-              <button type="submit" class="btn btn-primary">
-                <i class="fas fa-search"></i> Cari
-              </button>
-            </div>
-            <div>
-              <a th:href="@{/history}" class="btn btn-outline">Reset</a>
-            </div>
+
+            <button type="submit" class="history-button history-button-primary">
+              <i class="fas fa-search"></i>
+
+              Cari
+            </button>
+
+            <a
+              th:href="@{/history}"
+              class="history-button history-button-outline"
+            >
+              <i class="fas fa-rotate-left"></i>
+
+              Reset
+            </a>
           </form>
         </div>
 
-        <div class="table-container">
-          <table style="font-size: 0.95rem">
-            <thead>
-              <tr>
-                <th>Waktu</th>
-                <th>Aksi</th>
-                <th>Keterangan</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:each="log : ${logs}">
-                <td
-                  th:text="${#temporals.format(log.createdAt, 'dd MMM yyyy HH:mm')}"
-                >
-                  21 Dec 2025 10:00
-                </td>
-                <td>
-                  <span class="font-medium" th:text="${log.action}"
-                    >CREATE</span
-                  >
-                </td>
-                <td th:text="${log.description}">Deskripsi log</td>
-              </tr>
+        <!-- TABLE -->
 
-              <tr th:if="${#lists.isEmpty(logs)}">
-                <td
-                  colspan="3"
-                  class="text-center py-8"
-                  style="color: var(--text-light)"
-                >
-                  <i
-                    class="fas fa-history text-4xl mb-4 block"
-                    style="opacity: 0.5"
-                  ></i>
-                  <div>Tidak ada aktivitas</div>
-                  <div class="text-sm mt-1">
-                    Log akan muncul saat ada perubahan data
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="history-table-card">
+          <div class="history-table-wrapper">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Waktu</th>
+
+                  <th>Aksi</th>
+
+                  <th>Keterangan</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <!-- DATA -->
+
+                <tr th:each="log : ${logs}">
+                  <td data-label="Waktu" class="history-date">
+                    <i class="fas fa-clock"></i>
+
+                    <span
+                      th:text="${#temporals.format(log.createdAt, 'dd MMM yyyy HH:mm')}"
+                    >
+                      21 Dec 2025 10:00
+                    </span>
+                  </td>
+
+                  <td data-label="Aksi">
+                    <span class="history-action" th:text="${log.action}">
+                      CREATE
+                    </span>
+                  </td>
+
+                  <td
+                    data-label="Keterangan"
+                    class="history-description"
+                    th:text="${log.description}"
+                  >
+                    Deskripsi log
+                  </td>
+                </tr>
+
+                <!-- EMPTY -->
+
+                <tr th:if="${#lists.isEmpty(logs)}">
+                  <td colspan="3" style="border: none">
+                    <div class="history-empty">
+                      <div class="history-empty-icon">
+                        <i class="fas fa-history"></i>
+                      </div>
+
+                      <p class="history-empty-title">Tidak ada aktivitas</p>
+
+                      <p class="history-empty-text">
+                        Log akan muncul saat ada perubahan data.
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </main>
+
+    <!-- GLOBAL JAVASCRIPT -->
+
+    <script th:src="@{/js/main.js}"></script>
   </body>
 </html>

@@ -1,0 +1,163 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title
+      th:text="${category.id == null
+            ? 'Tambah Kategori - MyCash'
+            : 'Edit Kategori - MyCash'}"
+    >
+      Kategori - MyCash
+    </title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}" />
+
+    <link rel="stylesheet" th:href="@{/css/fontawesome.css}" />
+  </head>
+
+  <body>
+    <!-- SIDEBAR -->
+
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- CONTENT -->
+
+    <main class="content">
+      <div class="container">
+        <div style="max-width: 650px; margin: 0 auto">
+          <!-- HEADER -->
+
+          <div class="dashboard-header mb-6">
+            <div>
+              <h1 style="font-size: 1.9rem">
+                <span th:if="${category.id == null}"> Tambah Kategori </span>
+
+                <span th:if="${category.id != null}"> Edit Kategori </span>
+              </h1>
+
+              <p style="color: var(--text-light); margin-top: 6px">
+                Atur nama kategori dan akun jurnal.
+              </p>
+            </div>
+          </div>
+
+          <!-- ERROR -->
+
+          <div
+            th:if="${error}"
+            class="alert alert-danger"
+            style="
+              margin-bottom: 1.5rem;
+              padding: 14px 16px;
+              border-radius: 10px;
+            "
+          >
+            <i class="fas fa-exclamation-circle mr-2"> </i>
+
+            <span th:text="${error}"> Terjadi kesalahan. </span>
+          </div>
+
+          <!-- FORM CARD -->
+
+          <div class="auth-card">
+            <form
+              th:action="@{/categories/save}"
+              th:object="${category}"
+              method="post"
+            >
+              <!-- ID -->
+
+              <input type="hidden" th:field="*{id}" />
+
+              <!-- CATEGORY NAME -->
+
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="fas fa-tag mr-2" style="color: var(--navy-primary)">
+                  </i>
+
+                  Nama Kategori
+                </label>
+
+                <input
+                  type="text"
+                  th:field="*{name}"
+                  class="form-control"
+                  placeholder="Contoh: Makanan, Transportasi, Gaji"
+                  required
+                />
+              </div>
+
+              <!-- ACCOUNT NAME -->
+
+              <div class="form-group mt-4">
+                <label class="form-label">
+                  <i
+                    class="fas fa-book mr-2"
+                    style="color: var(--navy-primary)"
+                  >
+                  </i>
+
+                  Nama Akun Jurnal
+                </label>
+
+                <input
+                  type="text"
+                  th:field="*{accountName}"
+                  class="form-control"
+                  placeholder="Contoh: Beban Makanan, Pendapatan"
+                  required
+                />
+
+                <small
+                  style="
+                    color: var(--text-light);
+                    display: block;
+                    margin-top: 6px;
+                  "
+                >
+                  Digunakan untuk pencatatan jurnal debit / kredit.
+                </small>
+              </div>
+
+              <!-- BUTTON -->
+
+              <div style="display: flex; gap: 10px; margin-top: 2rem">
+                <!-- CANCEL -->
+
+                <a
+                  th:href="@{/categories}"
+                  class="btn btn-outline"
+                  style="flex: 1"
+                >
+                  <i class="fas fa-arrow-left mr-2"> </i>
+
+                  Batal
+                </a>
+
+                <!-- SAVE -->
+
+                <button type="submit" class="btn btn-primary" style="flex: 1">
+                  <i class="fas fa-save mr-2"> </i>
+
+                  <span
+                    th:text="${category.id == null
+                                        ? 'Simpan Kategori'
+                                        : 'Update Kategori'}"
+                  >
+                    Simpan Kategori
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script th:src="@{/js/main.js}"></script>
+  </body>
+</html>

@@ -14,11 +14,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // 🔥 FIRST RUN → LOGIN
-    @GetMapping("/")
-    public String root() {
-        return "redirect:/login";
-    }
+
 
     @GetMapping("/register")
     public String registerForm(Model model) {

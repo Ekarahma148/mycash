@@ -1,719 +1,672 @@
-<!DOCTYPE html>
+<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" lang="id">
-
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Dashboard - MyCash</title>
 
-    <link rel="stylesheet" th:href="@{/css/app.css}"/>
-    <link rel="stylesheet" th:href="@{/css/fontawesome.css}"/>
+    <link rel="stylesheet" th:href="@{/css/app.css}" />
+    <link rel="stylesheet" th:href="@{/css/fontawesome.css}" />
 
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-<div th:replace="~{fragments/sidebar :: sidebar}"></div>
-
-<main class="content">
-
-    <div class="container">
-
-        <!-- ========================= -->
+    <main class="content">
+      <div class="dashboard-page">
+        <!-- ================================= -->
         <!-- HEADER -->
-        <!-- ========================= -->
+        <!-- ================================= -->
 
-        <div class="dashboard-header">
-
-            <div>
-                <h1>Dashboard Keuangan</h1>
-
-                <p style="color: var(--text-light); margin-top: 0.5rem;">
-                    Pantau kondisi keuanganmu dengan mudah
-                </p>
+        <header class="modern-dashboard-header">
+          <div>
+            <div class="dashboard-eyebrow">
+              <span class="status-dot"></span>
+              Financial Overview
             </div>
 
-            <div class="date-display" id="current-date">
-                Loading...
+            <h1>Dashboard</h1>
+
+            <p>Pantau pemasukan, pengeluaran, dan kondisi keuanganmu.</p>
+          </div>
+
+          <div class="dashboard-header-right">
+            <div class="modern-date">
+              <i class="fas fa-calendar"></i>
+              <span id="current-date">Loading...</span>
             </div>
 
-        </div>
+            <a th:href="@{/transactions/add}" class="quick-add-button">
+              <i class="fas fa-plus"></i>
+              Tambah Transaksi
+            </a>
+          </div>
+        </header>
 
+        <!-- ================================= -->
+        <!-- HERO BALANCE -->
+        <!-- ================================= -->
 
-        <!-- ========================= -->
-        <!-- SUMMARY CARDS -->
-        <!-- ========================= -->
+        <section class="finance-hero">
+          <div class="balance-section">
+            <div class="balance-label">
+              <span>Total Saldo</span>
 
-        <div class="dashboard">
-
-            <!-- PEMASUKAN -->
-
-            <div class="card income">
-
-                <div>
-
-                    <div class="card-icon">
-                        <i class="fas fa-arrow-trend-up"></i>
-                    </div>
-
-                    <h3>Pemasukan</h3>
-
-                    <p class="amount">
-                        Rp
-                        <span
-                            th:text="${#numbers.formatDecimal(
-                                totalIn ?: 0,
-                                0,
-                                'COMMA',
-                                0,
-                                'POINT'
-                            )}">
-                            0
-                        </span>
-                    </p>
-
-                    <div class="card-trend trend-up">
-                        <i class="fas fa-arrow-up"></i>
-                        <span>Total pemasukan</span>
-                    </div>
-
-                </div>
-
+              <button
+                type="button"
+                class="balance-toggle"
+                onclick="toggleBalance()"
+                title="Tampilkan/sembunyikan saldo"
+              >
+                <i id="balance-eye" class="fas fa-eye"></i>
+              </button>
             </div>
 
-
-            <!-- PENGELUARAN -->
-
-            <div class="card expense">
-
-                <div>
-
-                    <div class="card-icon">
-                        <i class="fas fa-arrow-trend-down"></i>
-                    </div>
-
-                    <h3>Pengeluaran</h3>
-
-                    <p class="amount">
-                        Rp
-                        <span
-                            th:text="${#numbers.formatDecimal(
-                                totalOut ?: 0,
-                                0,
-                                'COMMA',
-                                0,
-                                'POINT'
-                            )}">
-                            0
-                        </span>
-                    </p>
-
-                    <div class="card-trend trend-down">
-                        <i class="fas fa-arrow-down"></i>
-                        <span>Total pengeluaran</span>
-                    </div>
-
-                </div>
-
+            <div
+              id="balance-value"
+              class="hero-balance"
+              th:text="'Rp ' + ${#numbers.formatDecimal(
+                        balance ?: 0,
+                        0,
+                        'COMMA',
+                        0,
+                        'POINT'
+                    )}"
+            >
+              Rp 0
             </div>
 
+            <div class="balance-status">
+              <span
+                th:class="${balance >= 0
+                            ? 'status-pill positive'
+                            : 'status-pill negative'}"
+              >
+                <i
+                  th:class="${balance >= 0
+                                ? 'fas fa-arrow-up'
+                                : 'fas fa-arrow-down'}"
+                >
+                </i>
 
-            <!-- SALDO -->
+                <span
+                  th:text="${balance >= 0
+                                ? 'Saldo positif'
+                                : 'Perlu perhatian'}"
+                >
+                  Saldo positif
+                </span>
+              </span>
 
-            <div class="card balance">
+              <span class="balance-period">
+                Tahun <span th:text="${currentYear}">2026</span>
+              </span>
+            </div>
+          </div>
 
-                <div>
+          <div class="hero-actions">
+            <a th:href="@{/transactions/new}" class="hero-action income-action">
+              <div class="action-icon">
+                <i class="fas fa-arrow-down"></i>
+              </div>
 
-                    <div class="card-icon">
-                        <i class="fas fa-wallet"></i>
-                    </div>
+              <div>
+                <span>Pemasukan</span>
+                <strong>Tambah uang</strong>
+              </div>
 
-                    <h3>Saldo Saat Ini</h3>
+              <i class="fas fa-chevron-right action-arrow"></i>
+            </a>
 
-                    <p class="amount">
-                        Rp
-                        <span
-                            th:text="${#numbers.formatDecimal(
-                                balance ?: 0,
-                                0,
-                                'COMMA',
-                                0,
-                                'POINT'
-                            )}">
-                            0
-                        </span>
-                    </p>
+            <a
+              th:href="@{/transactions/new}"
+              class="hero-action expense-action"
+            >
+              <div class="action-icon">
+                <i class="fas fa-arrow-up"></i>
+              </div>
 
-                    <div
-                        class="card-trend"
-                        th:classappend="${balance >= 0 ? 'trend-up' : 'trend-down'}">
+              <div>
+                <span>Pengeluaran</span>
+                <strong>Catat pengeluaran</strong>
+              </div>
 
-                        <i
-                            th:class="${balance >= 0
-                                ? 'fas fa-check-circle'
-                                : 'fas fa-exclamation-triangle'}">
-                        </i>
+              <i class="fas fa-chevron-right action-arrow"></i>
+            </a>
+          </div>
+        </section>
 
-                        <span
-                            th:text="${balance >= 0
-                                ? 'Keuangan Sehat'
-                                : 'Perlu Perhatian'}">
-                            Sehat
-                        </span>
+        <!-- ================================= -->
+        <!-- SUMMARY -->
+        <!-- ================================= -->
 
-                    </div>
+        <section class="summary-grid">
+          <!-- INCOME -->
 
-                </div>
+          <div class="summary-card">
+            <div class="summary-card-top">
+              <div class="summary-icon income-icon">
+                <i class="fas fa-arrow-trend-up"></i>
+              </div>
 
+              <span class="summary-label"> Pemasukan </span>
             </div>
 
-        </div>
+            <div
+              class="summary-value"
+              th:text="'Rp ' + ${#numbers.formatDecimal(
+                        totalIn ?: 0,
+                        0,
+                        'COMMA',
+                        0,
+                        'POINT'
+                    )}"
+            >
+              Rp 0
+            </div>
 
+            <div class="summary-footer positive-text">
+              <i class="fas fa-arrow-up"></i>
+              <span>Total pemasukan</span>
+            </div>
+          </div>
 
-        <!-- ========================= -->
+          <!-- EXPENSE -->
+
+          <div class="summary-card">
+            <div class="summary-card-top">
+              <div class="summary-icon expense-icon">
+                <i class="fas fa-arrow-trend-down"></i>
+              </div>
+
+              <span class="summary-label"> Pengeluaran </span>
+            </div>
+
+            <div
+              class="summary-value"
+              th:text="'Rp ' + ${#numbers.formatDecimal(
+                        totalOut ?: 0,
+                        0,
+                        'COMMA',
+                        0,
+                        'POINT'
+                    )}"
+            >
+              Rp 0
+            </div>
+
+            <div class="summary-footer negative-text">
+              <i class="fas fa-arrow-down"></i>
+              <span>Total pengeluaran</span>
+            </div>
+          </div>
+
+          <!-- TRANSACTIONS -->
+
+          <div class="summary-card">
+            <div class="summary-card-top">
+              <div class="summary-icon blue-icon">
+                <i class="fas fa-receipt"></i>
+              </div>
+
+              <span class="summary-label"> Aktivitas </span>
+            </div>
+
+            <div
+              class="summary-value"
+              th:text="${transactions != null ? #lists.size(transactions) : 0}"
+            >
+              0
+            </div>
+
+            <div class="summary-footer neutral-text">
+              <i class="fas fa-clock"></i>
+              <span>Transaksi terbaru</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================= -->
         <!-- ANALYTICS -->
-        <!-- ========================= -->
+        <!-- ================================= -->
 
-        <div class="dashboard-analytics">
+        <section class="analytics-grid">
+          <!-- CASH FLOW -->
 
+          <div class="analytics-card cash-flow-card">
+            <div class="analytics-header">
+              <div>
+                <span class="section-label"> ANALYTICS </span>
 
-            <!-- ========================= -->
-            <!-- MONTHLY CHART -->
-            <!-- ========================= -->
+                <h2>Cash Flow</h2>
 
-            <div class="card chart-card">
+                <p>
+                  Pemasukan dan pengeluaran tahun
+                  <strong th:text="${currentYear}"> 2026 </strong>
+                </p>
+              </div>
 
-                <div class="activity-header">
-
-                    <div>
-
-                        <h3>
-                            Pemasukan vs Pengeluaran
-                        </h3>
-
-                        <p
-                            style="
-                                color: var(--text-light);
-                                margin-top: 0.35rem;
-                                font-size: 0.9rem;
-                            "
-                            th:text="'Ringkasan keuangan tahun ' + ${currentYear}">
-                            Ringkasan keuangan
-                        </p>
-
-                    </div>
-
-                    <i
-                        class="fas fa-chart-line"
-                        style="font-size: 1.4rem;">
-                    </i>
-
-                </div>
-
-
-                <div
-                    style="
-                        position: relative;
-                        height: 350px;
-                        width: 100%;
-                    ">
-
-                    <canvas id="monthlyChart"></canvas>
-
-                </div>
-
+              <div class="chart-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
             </div>
 
+            <div class="chart-container">
+              <canvas id="monthlyChart"></canvas>
+            </div>
+          </div>
 
-            <!-- ========================= -->
-            <!-- CATEGORY CHART -->
-            <!-- ========================= -->
+          <!-- CATEGORY -->
 
-            <div class="card chart-card">
+          <div class="analytics-card category-card">
+            <div class="analytics-header">
+              <div>
+                <span class="section-label"> BREAKDOWN </span>
 
-                <div class="activity-header">
+                <h2>Pengeluaran</h2>
 
-                    <div>
+                <p>Berdasarkan kategori</p>
+              </div>
 
-                        <h3>
-                            Pengeluaran Berdasarkan Kategori
-                        </h3>
-
-                        <p
-                            style="
-                                color: var(--text-light);
-                                margin-top: 0.35rem;
-                                font-size: 0.9rem;
-                            "
-                            th:text="'Pengeluaran tahun ' + ${currentYear}">
-                            Pengeluaran berdasarkan kategori
-                        </p>
-
-                    </div>
-
-                    <i
-                        class="fas fa-chart-pie"
-                        style="font-size: 1.4rem;">
-                    </i>
-
-                </div>
-
-
-                <div
-                    style="
-                        position: relative;
-                        height: 350px;
-                        width: 100%;
-                    ">
-
-                    <canvas id="categoryChart"></canvas>
-
-                </div>
-
-                <!-- Jika belum ada data kategori -->
-
-                <div
-                    th:if="${categoryNames == null or #lists.isEmpty(categoryNames)}"
-                    style="
-                        text-align: center;
-                        padding: 2rem 1rem;
-                        color: var(--text-light);
-                    ">
-
-                    <i
-                        class="fas fa-chart-pie"
-                        style="
-                            font-size: 2.5rem;
-                            opacity: 0.4;
-                            margin-bottom: 1rem;
-                        ">
-                    </i>
-
-                    <p>
-                        Belum ada data pengeluaran berdasarkan kategori.
-                    </p>
-
-                </div>
-
+              <div class="chart-icon">
+                <i class="fas fa-chart-pie"></i>
+              </div>
             </div>
 
-        </div>
-
-
-        <!-- ========================= -->
-        <!-- RECENT ACTIVITY -->
-        <!-- ========================= -->
-
-        <div class="recent-activity">
-
-            <div class="activity-header">
-
-                <div>
-
-                    <h3>Aktivitas Terbaru</h3>
-
-                    <p
-                        style="
-                            color: var(--text-light);
-                            margin-top: 0.35rem;
-                            font-size: 0.9rem;
-                        ">
-                        5 transaksi terakhir
-                    </p>
-
-                </div>
-
-                <a
-                    th:href="@{/transactions}"
-                    class="btn btn-outline">
-
-                    <i class="fas fa-list mr-2"></i>
-                    Lihat Semua
-
-                </a>
-
+            <div
+              class="category-chart-container"
+              th:if="${categoryNames != null and !#lists.isEmpty(categoryNames)}"
+            >
+              <canvas id="categoryChart"></canvas>
             </div>
 
+            <div
+              class="empty-chart"
+              th:if="${categoryNames == null or #lists.isEmpty(categoryNames)}"
+            >
+              <div class="empty-chart-icon">
+                <i class="fas fa-chart-pie"></i>
+              </div>
 
-            <div class="activity-list">
+              <strong>Belum ada data</strong>
 
+              <span>
+                Tambahkan transaksi pengeluaran untuk melihat breakdown.
+              </span>
+            </div>
+          </div>
+        </section>
 
-                <!-- ADA TRANSAKSI -->
+        <!-- ================================= -->
+        <!-- RECENT TRANSACTIONS -->
+        <!-- ================================= -->
 
-                <div
-                    th:if="${transactions != null and !#lists.isEmpty(transactions)}">
+        <section class="transactions-card">
+          <div class="transactions-header">
+            <div>
+              <span class="section-label"> ACTIVITY </span>
 
-                    <div
-                        th:each="t : ${transactions}"
-                        class="activity-item">
+              <h2>Transaksi Terbaru</h2>
 
+              <p>Aktivitas keuangan terakhir</p>
+            </div>
 
-                        <!-- ICON -->
+            <a th:href="@{/transactions}" class="view-all-button">
+              Lihat semua
+              <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
 
-                        <div
-                            class="activity-icon"
-                            th:classappend="${t.type.name() == 'IN'}
-                                ? 'income'
-                                : 'expense'">
+          <div class="transaction-list">
+            <!-- ADA TRANSAKSI -->
 
-                            <i
-                                th:class="${t.type.name() == 'IN'}
-                                    ? 'fas fa-money-bill-transfer'
-                                    : 'fas fa-bag-shopping'">
-                            </i>
+            <div
+              th:if="${transactions != null and !#lists.isEmpty(transactions)}"
+              th:each="t : ${transactions}"
+              class="transaction-row"
+            >
+              <div
+                class="transaction-icon"
+                th:classappend="${t.type.name() == 'IN'}
+                            ? 'transaction-income'
+                            : 'transaction-expense'"
+              >
+                <i
+                  th:class="${t.type.name() == 'IN'}
+                                ? 'fas fa-arrow-down'
+                                : 'fas fa-arrow-up'"
+                >
+                </i>
+              </div>
 
-                        </div>
+              <div class="transaction-info">
+                <strong th:text="${t.description ?: 'Transaksi'}">
+                  Transaksi
+                </strong>
 
+                <span
+                  th:text="${t.category != null
+                                ? t.category.name
+                                : 'Umum'}"
+                >
+                  Umum
+                </span>
+              </div>
 
-                        <!-- DETAIL -->
+              <div class="transaction-date">
+                <i class="far fa-calendar"></i>
 
-                        <div class="activity-details">
+                <span
+                  th:text="${t.date != null
+                                ? #temporals.format(t.date, 'dd MMM yyyy')
+                                : '-'}"
+                >
+                  26 Sep 2026
+                </span>
+              </div>
 
-                            <div
-                                class="activity-title"
-                                th:text="${t.description ?: 'Transaksi'}">
-
-                                Transaksi
-
-                            </div>
-
-                            <div
-                                class="activity-description"
-                                th:text="${t.category != null
-                                    ? t.category.name
-                                    : 'Umum'}">
-
-                                Umum
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- NOMINAL -->
-
-                        <div
-                            class="activity-amount"
-                            th:classappend="${t.type.name() == 'OUT'}
-                                ? 'text-danger'
-                                : ''"
-                            th:text="${t.type.name() == 'IN'
+              <div
+                class="transaction-amount"
+                th:classappend="${t.type.name() == 'IN'}
+                            ? 'amount-income'
+                            : 'amount-expense'"
+              >
+                <span
+                  th:text="${t.type.name() == 'IN'
                                 ? '+ Rp '
-                                : '- Rp '}
-                                + ${#numbers.formatDecimal(
-                                    t.amount,
-                                    0,
-                                    'COMMA',
-                                    0,
-                                    'POINT'
-                                )}">
+                                : '- Rp '}"
+                >
+                  + Rp
+                </span>
 
-                            Rp 0
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- TIDAK ADA TRANSAKSI -->
-
-                <div
-                    class="activity-item text-center py-8"
-                    th:unless="${transactions != null and !#lists.isEmpty(transactions)}">
-
-                    <i
-                        class="fas fa-inbox text-5xl mb-4"
-                        style="opacity: 0.5">
-                    </i>
-
-                    <div class="activity-title">
-                        Belum ada transaksi
-                    </div>
-
-                    <div class="activity-description">
-                        Silakan tambah transaksi pertama
-                    </div>
-
-                </div>
-
+                <strong
+                  th:text="${#numbers.formatDecimal(
+                                t.amount,
+                                0,
+                                'COMMA',
+                                0,
+                                'POINT'
+                            )}"
+                >
+                  0
+                </strong>
+              </div>
             </div>
 
-        </div>
+            <!-- EMPTY -->
 
-    </div>
+            <div
+              th:unless="${transactions != null and !#lists.isEmpty(transactions)}"
+              class="transaction-empty"
+            >
+              <div class="empty-icon">
+                <i class="fas fa-receipt"></i>
+              </div>
 
-</main>
+              <strong>Belum ada transaksi</strong>
 
+              <span> Mulai catat transaksi pertamamu. </span>
 
-<!-- ========================= -->
-<!-- CHART DATA -->
-<!-- ========================= -->
+              <a th:href="@{/transactions/add}" class="empty-button">
+                <i class="fas fa-plus"></i>
+                Tambah transaksi
+              </a>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
 
-<script th:inline="javascript">
+    <!-- ================================= -->
+    <!-- THYMELEAF CHART DATA -->
+    <!-- ================================= -->
 
-    /*<![CDATA[*/
+    <script th:inline="javascript">
+      /*<![CDATA[*/
 
-    const monthlyIncome = /*[[${monthlyIncome}]]*/ [];
+      const monthlyIncome = /*[[${monthlyIncome}]]*/ [];
+      const monthlyExpense = /*[[${monthlyExpense}]]*/ [];
+      const categoryNames = /*[[${categoryNames}]]*/ [];
+      const categoryAmounts = /*[[${categoryAmounts}]]*/ [];
 
-    const monthlyExpense = /*[[${monthlyExpense}]]*/ [];
+      /*]]>*/
+    </script>
 
-    const categoryNames = /*[[${categoryNames}]]*/ [];
+    <!-- ================================= -->
+    <!-- DASHBOARD JAVASCRIPT -->
+    <!-- ================================= -->
 
-    const categoryAmounts = /*[[${categoryAmounts}]]*/ [];
+    <script>
+      /* ==========================
+       BALANCE VISIBILITY
+    ========================== */
 
-    /*]]>*/
+      let balanceVisible = true;
 
-</script>
+      function toggleBalance() {
+        const balance = document.getElementById("balance-value");
+        const eye = document.getElementById("balance-eye");
 
+        if (!balance) return;
 
-<!-- ========================= -->
-<!-- CHART SCRIPT -->
-<!-- ========================= -->
+        balanceVisible = !balanceVisible;
 
-<script>
+        if (balanceVisible) {
+          balance.style.filter = "blur(0)";
+          eye.className = "fas fa-eye";
+        } else {
+          balance.style.filter = "blur(8px)";
+          eye.className = "fas fa-eye-slash";
+        }
+      }
 
-    document.addEventListener("DOMContentLoaded", function () {
+      document.addEventListener("DOMContentLoaded", function () {
+        /* ==========================
+           MONTHLY CHART
+        ========================== */
 
-        // ==========================================
-        // MONTHLY CHART
-        // ==========================================
-
-        const monthlyCanvas =
-            document.getElementById("monthlyChart");
+        const monthlyCanvas = document.getElementById("monthlyChart");
 
         if (monthlyCanvas) {
+          new Chart(monthlyCanvas, {
+            type: "line",
 
-            new Chart(monthlyCanvas, {
+            data: {
+              labels: [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "Mei",
+                "Jun",
+                "Jul",
+                "Agu",
+                "Sep",
+                "Okt",
+                "Nov",
+                "Des",
+              ],
 
-                type: "line",
+              datasets: [
+                {
+                  label: "Pemasukan",
+                  data: monthlyIncome,
 
-                data: {
+                  borderColor: "#2563eb",
+                  backgroundColor: "rgba(37, 99, 235, 0.08)",
 
-                    labels: [
-                        "Jan",
-                        "Feb",
-                        "Mar",
-                        "Apr",
-                        "Mei",
-                        "Jun",
-                        "Jul",
-                        "Agu",
-                        "Sep",
-                        "Okt",
-                        "Nov",
-                        "Des"
-                    ],
+                  borderWidth: 3,
+                  tension: 0.4,
+                  fill: true,
 
-                    datasets: [
-
-                        {
-                            label: "Pemasukan",
-
-                            data: monthlyIncome,
-
-                            borderColor: "#22c55e",
-
-                            backgroundColor:
-                                "rgba(34, 197, 94, 0.10)",
-
-                            borderWidth: 3,
-
-                            tension: 0.35,
-
-                            fill: true,
-
-                            pointRadius: 4,
-
-                            pointHoverRadius: 6
-                        },
-
-                        {
-                            label: "Pengeluaran",
-
-                            data: monthlyExpense,
-
-                            borderColor: "#ef4444",
-
-                            backgroundColor:
-                                "rgba(239, 68, 68, 0.10)",
-
-                            borderWidth: 3,
-
-                            tension: 0.35,
-
-                            fill: true,
-
-                            pointRadius: 4,
-
-                            pointHoverRadius: 6
-                        }
-
-                    ]
-
+                  pointRadius: 3,
+                  pointHoverRadius: 6,
                 },
 
-                options: {
+                {
+                  label: "Pengeluaran",
+                  data: monthlyExpense,
 
-                    responsive: true,
+                  borderColor: "#ef4444",
+                  backgroundColor: "rgba(239, 68, 68, 0.06)",
 
-                    maintainAspectRatio: false,
+                  borderWidth: 3,
+                  tension: 0.4,
+                  fill: true,
 
-                    interaction: {
-                        intersect: false,
-                        mode: "index"
-                    },
+                  pointRadius: 3,
+                  pointHoverRadius: 6,
+                },
+              ],
+            },
 
-                    plugins: {
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
 
-                        legend: {
-                            position: "top"
-                        },
+              interaction: {
+                intersect: false,
+                mode: "index",
+              },
 
-                        tooltip: {
+              plugins: {
+                legend: {
+                  position: "top",
+                  align: "start",
 
-                            callbacks: {
-
-                                label: function (context) {
-
-                                    return context.dataset.label
-                                        + ": Rp "
-                                        + new Intl.NumberFormat(
-                                            "id-ID"
-                                        ).format(
-                                            context.raw || 0
-                                        );
-
-                                }
-
-                            }
-
-                        }
-
-                    },
-
-                    scales: {
-
-                        y: {
-
-                            beginAtZero: true,
-
-                            ticks: {
-
-                                callback: function (value) {
-
-                                    return "Rp "
-                                        + new Intl.NumberFormat(
-                                            "id-ID"
-                                        ).format(value);
-
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-            });
-
-        }
-
-
-        // ==========================================
-        // CATEGORY CHART
-        // ==========================================
-
-        const categoryCanvas =
-            document.getElementById("categoryChart");
-
-        if (
-            categoryCanvas &&
-            categoryNames &&
-            categoryNames.length > 0
-        ) {
-
-            new Chart(categoryCanvas, {
-
-                type: "doughnut",
-
-                data: {
-
-                    labels: categoryNames,
-
-                    datasets: [
-
-                        {
-
-                            data: categoryAmounts,
-
-                            borderWidth: 2
-
-                        }
-
-                    ]
-
+                  labels: {
+                    usePointStyle: true,
+                    padding: 20,
+                  },
                 },
 
-                options: {
+                tooltip: {
+                  backgroundColor: "#0f172a",
+                  padding: 12,
 
-                    responsive: true,
+                  callbacks: {
+                    label: function (context) {
+                      return (
+                        context.dataset.label +
+                        ": Rp " +
+                        new Intl.NumberFormat("id-ID").format(context.raw || 0)
+                      );
+                    },
+                  },
+                },
+              },
 
-                    maintainAspectRatio: false,
+              scales: {
+                x: {
+                  grid: {
+                    display: false,
+                  },
+                },
 
-                    plugins: {
+                y: {
+                  beginAtZero: true,
 
-                        legend: {
+                  border: {
+                    display: false,
+                  },
 
-                            position: "right"
+                  grid: {
+                    color: "#eef2f7",
+                  },
 
-                        },
+                  ticks: {
+                    callback: function (value) {
+                      if (value >= 1000000) {
+                        return "Rp " + (value / 1000000).toFixed(1) + "jt";
+                      }
 
-                        tooltip: {
+                      if (value >= 1000) {
+                        return "Rp " + (value / 1000).toFixed(0) + "rb";
+                      }
 
-                            callbacks: {
-
-                                label: function (context) {
-
-                                    const value =
-                                        context.raw || 0;
-
-                                    return context.label
-                                        + ": Rp "
-                                        + new Intl.NumberFormat(
-                                            "id-ID"
-                                        ).format(value);
-
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-            });
-
+                      return "Rp " + value;
+                    },
+                  },
+                },
+              },
+            },
+          });
         }
 
-    });
+        /* ==========================
+           CATEGORY CHART
+        ========================== */
 
-</script>
+        const categoryCanvas = document.getElementById("categoryChart");
 
+        if (categoryCanvas && categoryNames && categoryNames.length > 0) {
+          new Chart(categoryCanvas, {
+            type: "doughnut",
 
-<!-- ========================= -->
-<!-- MAIN JAVASCRIPT -->
-<!-- ========================= -->
+            data: {
+              labels: categoryNames,
 
-<script th:src="@{/js/main.js}"></script>
+              datasets: [
+                {
+                  data: categoryAmounts,
 
-</body>
+                  backgroundColor: [
+                    "#2563eb",
+                    "#14b8a6",
+                    "#f59e0b",
+                    "#ef4444",
+                    "#8b5cf6",
+                    "#ec4899",
+                    "#06b6d4",
+                  ],
+
+                  borderWidth: 0,
+
+                  hoverOffset: 8,
+                },
+              ],
+            },
+
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+
+              cutout: "68%",
+
+              plugins: {
+                legend: {
+                  position: "bottom",
+
+                  labels: {
+                    usePointStyle: true,
+                    padding: 15,
+                  },
+                },
+
+                tooltip: {
+                  backgroundColor: "#0f172a",
+                  padding: 12,
+
+                  callbacks: {
+                    label: function (context) {
+                      return (
+                        context.label +
+                        ": Rp " +
+                        new Intl.NumberFormat("id-ID").format(context.raw || 0)
+                      );
+                    },
+                  },
+                },
+              },
+            },
+          });
+        }
+      });
+    </script>
+
+    <script th:src="@{/js/main.js}"></script>
+  </body>
 </html>

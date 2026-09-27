@@ -7,9 +7,21 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.project.mycash.models.CategoryKas;
 import com.project.mycash.models.User;
 
-public interface CategoryKasRepository extends JpaRepository<CategoryKas, Long> {
+public interface CategoryKasRepository
+        extends JpaRepository<CategoryKas, Long> {
 
     List<CategoryKas> findByUser(User user);
 
-    CategoryKas findByIdAndUser(Long id, User user);
+    CategoryKas findByIdAndUser(
+            Long id,
+            User user);
+
+    boolean existsByNameAndUser(
+            String name,
+            User user);
+
+    boolean existsByNameAndUserAndIdNot(
+            String name,
+            User user,
+            Long id);
 }

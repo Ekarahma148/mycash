@@ -17,11 +17,15 @@ public class AuthInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession(false);
 
         // halaman publik
-        if (uri.startsWith("/login")
-                || uri.startsWith("/register")
-                || uri.startsWith("/css")) {
-            return true;
-        }
+       if (uri.equals("/")
+        || uri.startsWith("/login")
+        || uri.startsWith("/register")
+        || uri.startsWith("/css")
+        || uri.startsWith("/js")
+        || uri.startsWith("/images")
+        || uri.startsWith("/favicon")) {
+    return true;
+}
 
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("/login");
