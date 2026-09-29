@@ -19,6 +19,23 @@ public interface BudgetRepository
     Budget findByIdAndUser(Long id, User user);
 
     @Query("""
+        SELECT COUNT(b)
+        FROM Budget b
+        WHERE b.user = :user
+          AND b.category.id = :categoryId
+          AND (:budgetId IS NULL OR b.id <> :budgetId)
+          AND b.startDate <= :endDate
+          AND b.endDate >= :startDate
+    """)
+    long countOverlappingBudgets(
+            @Param("user") User user,
+            @Param("categoryId") Long categoryId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("budgetId") Long budgetId
+    );
+
+    @Query("""
         SELECT COALESCE(SUM(t.amount), 0)
         FROM CashTransaction t
         WHERE t.user = :user

@@ -2,10 +2,13 @@
 <html lang="id" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Budget - MyCash</title>
 
     <link rel="stylesheet" th:href="@{/css/app.css}" />
+
     <link rel="stylesheet" th:href="@{/css/fontawesome.css}" />
   </head>
 
@@ -15,423 +18,614 @@
 
     <!-- CONTENT -->
     <main class="content">
-      <div class="container">
-        <!-- HEADER -->
-        <div
-          class="dashboard-header mb-6"
-          style="
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 24px;
-          "
-        >
+      <div class="container budget-page">
+        <!-- =====================================================
+             HEADER
+        ====================================================== -->
+
+        <header class="budget-page-header">
           <div>
-            <h1 style="font-size: 1.9rem">Budget</h1>
-            <p style="color: var(--text-light); margin-top: 6px">
-              Atur batas pengeluaran dan pantau penggunaan uangmu.
+            <div class="budget-eyebrow">
+              <span class="budget-eyebrow-dot"></span>
+
+              Financial Planning
+            </div>
+
+            <h1>Budget</h1>
+
+            <p>
+              Atur batas pengeluaran, pantau pemakaian, dan jaga pengeluaran
+              tetap terkendali.
             </p>
           </div>
 
           <a
             th:href="@{/budgets/add}"
-            class="btn btn-primary"
-            style="white-space: nowrap"
+            class="btn btn-primary budget-create-btn"
           >
-            <i class="fas fa-plus mr-2"></i>
-            Buat Budget
+            <i class="fas fa-plus"></i>
+
+            <span> Buat Budget </span>
           </a>
+        </header>
+
+        <!-- =====================================================
+             ERROR
+        ====================================================== -->
+
+        <div th:if="${error}" class="budget-alert" role="alert">
+          <i class="fas fa-circle-exclamation"></i>
+
+          <div>
+            <strong> Tindakan tidak dapat diproses </strong>
+
+            <span th:text="${error}"> Terjadi kesalahan. </span>
+          </div>
         </div>
 
-        <!-- ERROR ALERT (jika ada) -->
-        <div
-          th:if="${error}"
-          class="alert alert-danger"
-          style="margin-bottom: 1.5rem; padding: 14px 16px; border-radius: 10px"
-        >
-          <i class="fas fa-exclamation-circle mr-2"></i>
-          <span th:text="${error}">Terjadi kesalahan.</span>
-        </div>
+        <!-- =====================================================
+             OVERVIEW
+        ====================================================== -->
 
-        <!-- EMPTY STATE -->
-        <div
-          th:if="${#lists.isEmpty(budgets)}"
-          class="auth-card"
-          style="text-align: center; padding: 60px 30px"
+        <section
+          th:if="${!#lists.isEmpty(budgets)}"
+          class="budget-overview-grid"
+          aria-label="Ringkasan budget"
         >
+          <!-- TOTAL BUDGET -->
+
+          <article class="budget-overview-card">
+            <div class="budget-overview-icon navy">
+              <i class="fas fa-wallet"></i>
+            </div>
+
+            <div>
+              <span> Total Budget </span>
+
+              <strong
+                th:text="${'Rp ' + #numbers.formatInteger(overview.totalBudget, 1, 'POINT')}"
+              >
+                Rp 0
+              </strong>
+            </div>
+          </article>
+
+          <!-- TOTAL TERPAKAI -->
+
+          <article class="budget-overview-card">
+            <div class="budget-overview-icon teal">
+              <i class="fas fa-chart-line"></i>
+            </div>
+
+            <div>
+              <span> Total Terpakai </span>
+
+              <strong
+                th:text="${'Rp ' + #numbers.formatInteger(overview.totalUsed, 1, 'POINT')}"
+              >
+                Rp 0
+              </strong>
+            </div>
+          </article>
+
+          <!-- SISA -->
+
+          <article class="budget-overview-card">
+            <div class="budget-overview-icon gold">
+              <i class="fas fa-coins"></i>
+            </div>
+
+            <div>
+              <span> Sisa Bersih </span>
+
+              <strong
+                th:classappend="${overview.totalRemaining < 0 ? ' is-negative' : ''}"
+                th:text="${'Rp ' + #numbers.formatInteger(overview.totalRemaining, 1, 'POINT')}"
+              >
+                Rp 0
+              </strong>
+            </div>
+          </article>
+
+          <!-- BUDGET AKTIF -->
+
+          <article class="budget-overview-card">
+            <div class="budget-overview-icon purple">
+              <i class="fas fa-bullseye"></i>
+            </div>
+
+            <div>
+              <span> Budget Aktif </span>
+
+              <strong
+                th:text="${overview.activeCount + ' dari ' + overview.totalCount}"
+              >
+                0 dari 0
+              </strong>
+            </div>
+          </article>
+        </section>
+
+        <!-- =====================================================
+             TOOLBAR
+        ====================================================== -->
+
+        <section th:if="${!#lists.isEmpty(budgets)}" class="budget-toolbar">
+          <!-- SEARCH -->
+
+          <div class="budget-search">
+            <i class="fas fa-search"></i>
+
+            <input
+              id="budget-search"
+              type="search"
+              placeholder="Cari kategori budget..."
+              autocomplete="off"
+            />
+          </div>
+
+          <!-- FILTER -->
+
           <div
-            style="
-              width: 76px;
-              height: 76px;
-              margin: 0 auto 20px;
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              background: rgba(var(--navy-primary-rgb, 10, 25, 47), 0.06);
-              color: var(--navy-primary);
-              font-size: 30px;
-            "
+            class="budget-filters"
+            role="group"
+            aria-label="Filter periode budget"
           >
+            <button
+              type="button"
+              class="budget-filter active"
+              data-filter="ALL"
+            >
+              Semua
+            </button>
+
+            <button type="button" class="budget-filter" data-filter="ACTIVE">
+              Aktif
+            </button>
+
+            <button type="button" class="budget-filter" data-filter="UPCOMING">
+              Akan Datang
+            </button>
+
+            <button type="button" class="budget-filter" data-filter="ENDED">
+              Selesai
+            </button>
+          </div>
+        </section>
+
+        <!-- =====================================================
+             EMPTY STATE
+        ====================================================== -->
+
+        <div th:if="${#lists.isEmpty(budgets)}" class="auth-card budget-empty">
+          <div class="budget-empty-icon">
             <i class="fas fa-bullseye"></i>
           </div>
 
-          <h2 style="margin: 0 0 8px; color: var(--text-main); font-size: 22px">
-            Belum ada budget
-          </h2>
+          <span class="budget-empty-kicker"> START PLANNING </span>
 
-          <p
-            style="
-              max-width: 500px;
-              margin: 0 auto 24px;
-              color: var(--text-light);
-              line-height: 1.6;
-            "
-          >
+          <h2>Belum ada budget</h2>
+
+          <p>
             Buat budget untuk kategori tertentu agar kamu bisa mengetahui apakah
             pengeluaran masih sesuai batas.
           </p>
 
           <a th:href="@{/budgets/add}" class="btn btn-primary">
-            <i class="fas fa-plus mr-2"></i>
+            <i class="fas fa-plus"></i>
+
             Buat Budget Pertama
           </a>
         </div>
 
-        <!-- BUDGET LIST -->
-        <div
+        <!-- =====================================================
+             BUDGET LIST
+        ====================================================== -->
+
+        <section
           th:if="${!#lists.isEmpty(budgets)}"
-          style="
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 20px;
-          "
+          class="budget-list"
+          id="budget-list"
         >
-          <div
+          <article
             th:each="budget : ${budgets}"
-            class="auth-card"
-            style="transition: 0.2s ease"
+            class="auth-card budget-card"
+            th:attr="
+                    data-category=${budget.categoryName},
+                    data-period=${budget.periodStatus}"
           >
-            <!-- CARD HEADER -->
-            <div
-              style="
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-                gap: 16px;
-              "
-            >
-              <div
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: 12px;
-                  min-width: 0;
-                "
-              >
-                <div
-                  style="
-                    width: 44px;
-                    height: 44px;
-                    flex-shrink: 0;
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: rgba(var(--navy-primary-rgb, 10, 25, 47), 0.06);
-                    color: var(--navy-primary);
-                  "
-                >
+            <!-- =================================================
+                     CARD HEADER
+                ================================================== -->
+
+            <div class="budget-card-header">
+              <!-- CATEGORY -->
+
+              <div class="budget-category">
+                <div class="budget-category-icon">
                   <i class="fas fa-layer-group"></i>
                 </div>
-                <div>
+
+                <div class="budget-category-copy">
                   <h2
+                    class="budget-category-name"
                     th:text="${budget.categoryName}"
-                    style="
-                      margin: 0;
-                      color: var(--text-main);
-                      font-size: 17px;
-                      font-weight: 700;
-                    "
                   >
                     Makanan
                   </h2>
+
                   <p
-                    style="
-                      margin: 5px 0 0;
-                      color: var(--text-light);
-                      font-size: 13px;
-                    "
-                    th:text="${#temporals.format(budget.startDate, 'dd MMM yyyy') + ' - ' + #temporals.format(budget.endDate, 'dd MMM yyyy')}"
+                    class="budget-period"
+                    th:text="${#temporals.format(
+                                    budget.startDate,
+                                    'dd MMM yyyy'
+                                )
+                                + ' - ' +
+                                #temporals.format(
+                                    budget.endDate,
+                                    'dd MMM yyyy'
+                                )}"
                   >
                     01 Sep 2026 - 30 Sep 2026
                   </p>
                 </div>
               </div>
 
-              <!-- STATUS BADGE -->
-              <div
-                th:if="${budget.status == 'SAFE'}"
-                class="badge badge-success"
-                style="
-                  padding: 6px 10px;
-                  border-radius: 999px;
-                  font-size: 11px;
-                  font-weight: 700;
-                "
-              >
-                <i class="fas fa-check mr-1"></i> Aman
-              </div>
-              <div
-                th:if="${budget.status == 'WARNING'}"
-                class="badge badge-warning"
-                style="
-                  padding: 6px 10px;
-                  border-radius: 999px;
-                  font-size: 11px;
-                  font-weight: 700;
-                "
-              >
-                <i class="fas fa-triangle-exclamation mr-1"></i> Mendekati Batas
-              </div>
-              <div
-                th:if="${budget.status == 'OVER'}"
-                class="badge badge-danger"
-                style="
-                  padding: 6px 10px;
-                  border-radius: 999px;
-                  font-size: 11px;
-                  font-weight: 700;
-                "
-              >
-                <i class="fas fa-circle-exclamation mr-1"></i> Melebihi Budget
+              <!-- STATUS -->
+
+              <div class="budget-status-group">
+                <!-- ACTIVE -->
+
+                <span
+                  th:if="${budget.periodStatus == 'ACTIVE'}"
+                  class="budget-period-badge active"
+                >
+                  <i class="fas fa-circle"></i>
+
+                  Aktif
+                </span>
+
+                <!-- UPCOMING -->
+
+                <span
+                  th:if="${budget.periodStatus == 'UPCOMING'}"
+                  class="budget-period-badge upcoming"
+                >
+                  <i class="fas fa-clock"></i>
+
+                  Akan datang
+                </span>
+
+                <!-- ENDED -->
+
+                <span
+                  th:if="${budget.periodStatus == 'ENDED'}"
+                  class="budget-period-badge ended"
+                >
+                  <i class="fas fa-check"></i>
+
+                  Selesai
+                </span>
+
+                <!-- SAFE -->
+
+                <span
+                  th:if="${budget.status == 'SAFE'}"
+                  class="badge badge-success"
+                >
+                  <i class="fas fa-check"></i>
+
+                  Aman
+                </span>
+
+                <!-- WARNING -->
+
+                <span
+                  th:if="${budget.status == 'WARNING'}"
+                  class="badge badge-warning"
+                >
+                  <i class="fas fa-triangle-exclamation"></i>
+
+                  Mendekati batas
+                </span>
+
+                <!-- OVER -->
+
+                <span
+                  th:if="${budget.status == 'OVER'}"
+                  class="badge badge-danger"
+                >
+                  <i class="fas fa-circle-exclamation"></i>
+
+                  Melebihi budget
+                </span>
               </div>
             </div>
 
-            <!-- AMOUNT GRID -->
-            <div
-              style="
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 18px;
-                margin-top: 24px;
-              "
-            >
-              <div>
-                <p style="margin: 0; color: var(--text-light); font-size: 13px">
-                  Budget
-                </p>
+            <!-- =================================================
+                     AMOUNT
+                ================================================== -->
+
+            <div class="budget-amount-grid">
+              <!-- BUDGET -->
+
+              <div class="budget-metric">
+                <p class="budget-metric-label">Budget</p>
+
                 <p
-                  style="
-                    margin: 6px 0 0;
-                    color: var(--text-main);
-                    font-size: 20px;
-                    font-weight: 700;
-                  "
-                  th:text="${'Rp ' + #numbers.formatDecimal(budget.budgetAmount, 0, 'POINT')}"
+                  class="budget-metric-value"
+                  th:text="${'Rp ' +
+                            #numbers.formatInteger(
+                                budget.budgetAmount,
+                                1,
+                                'POINT'
+                            )}"
                 >
                   Rp 1.000.000
                 </p>
               </div>
-              <div>
-                <p style="margin: 0; color: var(--text-light); font-size: 13px">
-                  Terpakai
-                </p>
+
+              <!-- USED -->
+
+              <div class="budget-metric">
+                <p class="budget-metric-label">Terpakai</p>
+
                 <p
-                  style="
-                    margin: 6px 0 0;
-                    color: var(--text-main);
-                    font-size: 20px;
-                    font-weight: 700;
-                  "
-                  th:text="${'Rp ' + #numbers.formatDecimal(budget.usedAmount, 0, 'POINT')}"
+                  class="budget-metric-value"
+                  th:text="${'Rp ' +
+                            #numbers.formatInteger(
+                                budget.usedAmount,
+                                1,
+                                'POINT'
+                            )}"
                 >
                   Rp 500.000
                 </p>
               </div>
             </div>
 
-            <!-- PROGRESS BAR -->
-            <div style="margin-top: 24px">
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  margin-bottom: 8px;
-                "
-              >
-                <span style="color: var(--text-light); font-size: 13px"
-                  >Penggunaan</span
-                >
-                <span
-                  style="
-                    color: var(--text-main);
-                    font-size: 13px;
-                    font-weight: 700;
-                  "
-                  th:text="${budget.percentage + '%'}"
-                  >50%</span
-                >
+            <!-- =================================================
+                     PROGRESS
+                ================================================== -->
+
+            <div class="budget-progress">
+              <div class="budget-progress-label">
+                <span> Penggunaan budget </span>
+
+                <strong th:text="${budget.percentage + '%'}"> 50% </strong>
               </div>
+
               <div
-                style="
-                  height: 9px;
-                  overflow: hidden;
-                  border-radius: 999px;
-                  background: #e5e7eb;
-                "
+                class="budget-progress-track"
+                role="progressbar"
+                th:attr="
+                            aria-valuenow=${budget.percentage},
+                            aria-valuemin=0,
+                            aria-valuemax=100"
               >
                 <div
-                  th:if="${budget.status == 'SAFE'}"
-                  style="
-                    height: 100%;
-                    border-radius: 999px;
-                    background: #10b981;
-                  "
-                  th:style="'width:' + ${budget.percentage} + '%; height: 100%; border-radius: 999px; background: #10b981;'"
+                  class="budget-progress-bar"
+                  th:classappend="${
+
+                                budget.status == 'SAFE'
+                                ? ' safe'
+
+                                : (
+
+                                    budget.status == 'WARNING'
+                                    ? ' warning'
+
+                                    : ' over'
+
+                                )
+
+                            }"
+                  th:style="'width:' +
+                            (${budget.percentage > 100
+                                ? 100
+                                : budget.percentage}) +
+                            '%'"
                 ></div>
-                <div
-                  th:if="${budget.status == 'WARNING'}"
-                  style="
-                    height: 100%;
-                    border-radius: 999px;
-                    background: #f59e0b;
-                  "
-                  th:style="'width:' + ${budget.percentage} + '%; height: 100%; border-radius: 999px; background: #f59e0b;'"
-                ></div>
-                <div
-                  th:if="${budget.status == 'OVER'}"
-                  style="
-                    height: 100%;
-                    border-radius: 999px;
-                    background: #ef4444;
-                    width: 100%;
-                  "
-                ></div>
+              </div>
+
+              <div
+                class="budget-progress-note"
+                th:if="${budget.percentage > 100}"
+              >
+                Pengeluaran sudah melewati batas budget.
               </div>
             </div>
 
-            <!-- REMAINING BOX -->
+            <!-- =================================================
+                     REMAINING - SAFE
+                ================================================== -->
+
             <div
               th:if="${budget.remainingAmount >= 0}"
-              style="
-                margin-top: 20px;
-                padding: 15px;
-                border-radius: 12px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                background: #ecfdf5;
-              "
+              class="budget-remaining safe"
             >
               <div>
+                <p class="budget-remaining-label">Sisa Budget</p>
+
                 <p
-                  style="
-                    margin: 0;
-                    font-size: 12px;
-                    font-weight: 600;
-                    color: #047857;
-                  "
-                >
-                  Sisa Budget
-                </p>
-                <p
-                  style="
-                    margin: 5px 0 0;
-                    font-size: 18px;
-                    font-weight: 700;
-                    color: #047857;
-                  "
-                  th:text="${'Rp ' + #numbers.formatDecimal(budget.remainingAmount, 0, 'POINT')}"
+                  class="budget-remaining-value"
+                  th:text="${'Rp ' +
+                            #numbers.formatInteger(
+                                budget.remainingAmount,
+                                1,
+                                'POINT'
+                            )}"
                 >
                   Rp 500.000
                 </p>
               </div>
-              <i class="fas fa-wallet" style="color: #047857"></i>
+
+              <i class="fas fa-wallet"></i>
             </div>
+
+            <!-- =================================================
+                     REMAINING - OVER
+                ================================================== -->
 
             <div
               th:if="${budget.remainingAmount < 0}"
-              style="
-                margin-top: 20px;
-                padding: 15px;
-                border-radius: 12px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                background: #fef2f2;
-              "
+              class="budget-remaining over"
             >
               <div>
+                <p class="budget-remaining-label">Melebihi Budget</p>
+
                 <p
-                  style="
-                    margin: 0;
-                    font-size: 12px;
-                    font-weight: 600;
-                    color: #b91c1c;
-                  "
-                >
-                  Melebihi Budget
-                </p>
-                <p
-                  style="
-                    margin: 5px 0 0;
-                    font-size: 18px;
-                    font-weight: 700;
-                    color: #b91c1c;
-                  "
-                  th:text="${'Rp ' + #numbers.formatDecimal(budget.remainingAmount.abs(), 0, 'POINT')}"
+                  class="budget-remaining-value"
+                  th:text="${'Rp ' +
+                            #numbers.formatInteger(
+                                budget.remainingAmount.abs(),
+                                1,
+                                'POINT'
+                            )}"
                 >
                   Rp 200.000
                 </p>
               </div>
-              <i class="fas fa-arrow-trend-up" style="color: #b91c1c"></i>
+
+              <i class="fas fa-arrow-trend-up"></i>
             </div>
 
-            <!-- ACTIONS -->
+            <!-- =================================================
+                     PERIOD NOTE
+                ================================================== -->
+
             <div
-              style="
-                display: flex;
-                justify-content: flex-end;
-                gap: 8px;
-                margin-top: 20px;
-                padding-top: 20px;
-                border-top: 1px solid var(--border-color, #f1f5f9);
-              "
+              class="budget-period-note"
+              th:if="${budget.periodStatus == 'ACTIVE'}"
             >
+              <i class="fas fa-calendar-day"></i>
+
+              <span
+                th:text="${budget.daysRemaining == 0
+                            ? 'Hari terakhir budget'
+                            : budget.daysRemaining + ' hari lagi'}"
+              >
+                10 hari lagi
+              </span>
+            </div>
+
+            <!-- =================================================
+                     ACTIONS
+                ================================================== -->
+
+            <div class="budget-card-actions">
+              <!-- EDIT -->
+
               <a
                 th:href="@{/budgets/edit/{id}(id=${budget.id})}"
                 class="btn btn-outline"
-                style="padding: 8px 14px; font-size: 13px"
               >
-                <i class="fas fa-pen mr-1"></i> Edit
+                <i class="fas fa-pen"></i>
+
+                <span> Edit </span>
               </a>
+
+              <!-- DELETE -->
+
               <form
                 th:action="@{/budgets/delete/{id}(id=${budget.id})}"
                 method="post"
+                class="budget-delete-form"
                 onsubmit="return confirm('Yakin ingin menghapus budget ini?');"
-                style="margin: 0"
               >
-                <button
-                  type="submit"
-                  class="btn btn-danger"
-                  style="
-                    padding: 8px 14px;
-                    font-size: 13px;
-                    background: #fef2f2;
-                    color: #dc2626;
-                    border: none;
-                  "
-                >
-                  <i class="fas fa-trash mr-1"></i> Hapus
+                <button type="submit" class="btn budget-delete">
+                  <i class="fas fa-trash"></i>
+
+                  <span> Hapus </span>
                 </button>
               </form>
             </div>
-          </div>
+          </article>
+        </section>
+
+        <!-- =====================================================
+             NO SEARCH RESULT
+        ====================================================== -->
+
+        <div id="budget-no-result" class="budget-no-result" hidden>
+          <i class="fas fa-filter-circle-xmark"></i>
+
+          <h3>Budget tidak ditemukan</h3>
+
+          <p>Coba gunakan kata kunci atau filter periode yang berbeda.</p>
         </div>
       </div>
     </main>
 
+    <!-- =========================================================
+     MAIN JS
+========================================================= -->
+
     <script th:src="@{/js/main.js}"></script>
+
+    <!-- =========================================================
+     BUDGET FILTER
+========================================================= -->
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const cards = [...document.querySelectorAll(".budget-card")];
+
+        const search = document.getElementById("budget-search");
+
+        const empty = document.getElementById("budget-no-result");
+
+        const filters = [...document.querySelectorAll(".budget-filter")];
+
+        let activeFilter = "ALL";
+
+        function applyFilter() {
+          const keyword = (search?.value || "").trim().toLowerCase();
+
+          let visible = 0;
+
+          cards.forEach((card) => {
+            const category = (card.dataset.category || "").toLowerCase();
+
+            const period = card.dataset.period || "";
+
+            const matchesSearch = category.includes(keyword);
+
+            const matchesFilter =
+              activeFilter === "ALL" || period === activeFilter;
+
+            const show = matchesSearch && matchesFilter;
+
+            card.hidden = !show;
+
+            if (show) {
+              visible++;
+            }
+          });
+
+          if (empty) {
+            empty.hidden = visible !== 0;
+          }
+        }
+
+        /* SEARCH */
+
+        search?.addEventListener("input", applyFilter);
+
+        /* FILTER BUTTON */
+
+        filters.forEach((button) => {
+          button.addEventListener("click", () => {
+            activeFilter = button.dataset.filter;
+
+            filters.forEach((item) => {
+              item.classList.toggle("active", item === button);
+            });
+
+            applyFilter();
+          });
+        });
+      });
+    </script>
   </body>
 </html>

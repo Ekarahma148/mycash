@@ -1,188 +1,159 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org" lang="id">
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title
-      th:text="${budget.id == null ? 'Buat Budget - MyCash' : 'Edit Budget - MyCash'}"
-    >
-      Budget - MyCash
-    </title>
-
+    <title th:text="${budget.id == null ? 'Buat Budget Baru - MyCash' : 'Edit Budget - MyCash'}">Budget - MyCash</title>
     <link rel="stylesheet" th:href="@{/css/app.css}" />
     <link rel="stylesheet" th:href="@{/css/fontawesome.css}" />
   </head>
 
   <body>
-    <!-- SIDEBAR -->
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-    <!-- CONTENT -->
     <main class="content">
-      <div class="container">
-        <div style="max-width: 700px; margin: 0 auto">
-          
-          <!-- HEADER -->
-          <div class="dashboard-header mb-6">
+      <div class="container budget-page">
+        <div class="budget-form-wrapper">
+          <header class="budget-page-header budget-form-header">
             <div>
-              <h1 style="font-size: 1.9rem">
-                <span th:if="${budget.id == null}">Buat Budget Baru</span>
-                <span th:if="${budget.id != null}">Edit Budget</span>
-              </h1>
-              <p style="color: var(--text-light); margin-top: 6px">
-                Tentukan batas pengeluaran untuk kategori dan periode tertentu.
-              </p>
+              <a th:href="@{/budgets}" class="budget-back-link">
+                <i class="fas fa-arrow-left"></i>
+                Kembali ke Budget
+              </a>
+              <div class="budget-eyebrow">
+                <span class="budget-eyebrow-dot"></span>
+                Budget Management
+              </div>
+              <h1 th:text="${budget.id == null ? 'Buat Budget Baru' : 'Edit Budget'}">Buat Budget Baru</h1>
+              <p>Tentukan batas pengeluaran berdasarkan kategori dan periode yang ingin kamu pantau.</p>
+            </div>
+          </header>
+
+          <div th:if="${error}" class="budget-alert" role="alert">
+            <i class="fas fa-circle-exclamation"></i>
+            <div>
+              <strong>Periksa kembali budget</strong>
+              <span th:text="${error}">Terjadi kesalahan.</span>
             </div>
           </div>
 
-          <!-- ERROR ALERT (jika ada) -->
-          <div
-            th:if="${error}"
-            class="alert alert-danger"
-            style="
-              margin-bottom: 1.5rem;
-              padding: 14px 16px;
-              border-radius: 10px;
-            "
-          >
-            <i class="fas fa-exclamation-circle mr-2"></i>
-            <span th:text="${error}">Terjadi kesalahan.</span>
+          <div th:if="${#lists.isEmpty(categories)}" class="budget-alert budget-alert-info">
+            <i class="fas fa-circle-info"></i>
+            <div>
+              <strong>Belum ada kategori pengeluaran</strong>
+              <span>Buat kategori terlebih dahulu agar budget dapat digunakan.</span>
+            </div>
           </div>
 
-          <!-- FORM CARD -->
-          <div class="auth-card">
-            <form
-              th:action="@{/budgets/save}"
-              th:object="${budget}"
-              method="post"
-            >
-              <!-- ID -->
+          <section class="auth-card budget-form-card">
+            <div class="budget-form-intro">
+              <div class="budget-form-intro-icon"><i class="fas fa-bullseye"></i></div>
+              <div>
+                <span>Atur target pengeluaran</span>
+                <p>MyCash akan menghitung transaksi <strong>pengeluaran</strong> sesuai kategori dan tanggal budget.</p>
+              </div>
+            </div>
+
+            <form th:action="@{/budgets/save}" th:object="${budget}" method="post" class="budget-form" novalidate>
               <input type="hidden" th:field="*{id}" />
 
-              <!-- CATEGORY -->
-              <div class="form-group">
-                <label class="form-label">
-                  <i class="fas fa-bullseye mr-2" style="color: var(--navy-primary)"></i>
+              <div class="budget-field">
+                <label class="form-label" for="category">
+                  <i class="fas fa-tags"></i>
                   Kategori Pengeluaran
                 </label>
-                <select
-                  id="category"
-                  th:field="*{category.id}"
-                  class="form-control"
-                  required
-                >
-                  <option value="" disabled>Pilih kategori</option>
-                  <option
-                    th:each="cat : ${categories}"
-                    th:value="${cat.id}"
-                    th:text="${cat.name}"
-                  >
-                    Makanan
-                  </option>
+                <select id="category" th:field="*{category.id}" class="form-control" required>
+                  <option value="">Pilih kategori</option>
+                  <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}">Makanan</option>
                 </select>
-                <small style="color: var(--text-light); display: block; margin-top: 6px">
-                  Budget akan menghitung transaksi pengeluaran pada kategori yang dipilih.
-                </small>
+                <small>Pilih kategori yang ingin diberi batas pengeluaran.</small>
               </div>
 
-              <!-- AMOUNT -->
-              <div class="form-group mt-4">
-                <label class="form-label">
-                  <i class="fas fa-wallet mr-2" style="color: var(--navy-primary)"></i>
+              <div class="budget-field">
+                <label class="form-label" for="amount">
+                  <i class="fas fa-wallet"></i>
                   Nominal Budget
                 </label>
-                <div style="position: relative;">
-                  <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-light); font-weight: 600;">
-                    Rp
-                  </span>
-                  <input
-                    id="amount"
-                    type="number"
-                    min="1"
-                    step="1"
-                    th:field="*{amount}"
-                    class="form-control"
-                    style="padding-left: 42px;"
-                    placeholder="1000000"
-                    required
-                  />
+                <div class="budget-money">
+                  <span class="budget-money-prefix">Rp</span>
+                  <input id="amount" type="number" min="1" step="1" th:field="*{amount}" class="form-control" placeholder="1000000" inputmode="numeric" required />
                 </div>
-                <small style="color: var(--text-light); display: block; margin-top: 6px">
-                  Masukkan batas maksimal pengeluaran.
-                </small>
+                <small>Gunakan angka tanpa titik atau simbol. Contoh: 1500000.</small>
               </div>
 
-              <!-- DATE GRID -->
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;" class="mt-4">
-                <div class="form-group">
-                  <label class="form-label">
-                    <i class="fas fa-calendar-alt mr-2" style="color: var(--navy-primary)"></i>
+              <div class="budget-grid">
+                <div class="budget-field">
+                  <label class="form-label" for="startDate">
+                    <i class="fas fa-calendar-plus"></i>
                     Tanggal Mulai
                   </label>
-                  <input
-                    id="startDate"
-                    type="date"
-                    th:field="*{startDate}"
-                    class="form-control"
-                    required
-                  />
+                  <input id="startDate" type="date" th:field="*{startDate}" class="form-control" required />
                 </div>
 
-                <div class="form-group">
-                  <label class="form-label">
-                    <i class="fas fa-calendar-check mr-2" style="color: var(--navy-primary)"></i>
+                <div class="budget-field">
+                  <label class="form-label" for="endDate">
+                    <i class="fas fa-calendar-check"></i>
                     Tanggal Selesai
                   </label>
-                  <input
-                    id="endDate"
-                    type="date"
-                    th:field="*{endDate}"
-                    class="form-control"
-                    required
-                  />
+                  <input id="endDate" type="date" th:field="*{endDate}" class="form-control" required />
                 </div>
               </div>
 
-              <!-- INFO BOX -->
-              <div style="display: flex; gap: 12px; padding: 14px 16px; margin-top: 1.5rem; border-radius: 10px; background: rgba(var(--navy-primary-rgb, 10, 25, 47), 0.04); border: 1px solid rgba(var(--navy-primary-rgb, 10, 25, 47), 0.1);">
-                <i class="fas fa-circle-info" style="color: var(--navy-primary); margin-top: 3px;"></i>
+              <div class="budget-date-hint">
+                <i class="fas fa-shield-halved"></i>
+                <span>Periode budget untuk kategori yang sama tidak boleh saling beririsan.</span>
+              </div>
+
+              <div class="budget-info">
+                <i class="fas fa-circle-info"></i>
                 <div>
-                  <p style="margin: 0; color: var(--navy-primary); font-size: 13px; font-weight: 700;">Cara kerja Budget</p>
-                  <p style="margin: 4px 0 0; color: var(--text-light); font-size: 13px; line-height: 1.5;">
-                    MyCash akan otomatis menghitung total transaksi pengeluaran pada kategori yang dipilih selama periode budget.
-                  </p>
+                  <p class="budget-info-title">Cara kerja Budget</p>
+                  <p class="budget-info-text">Total terpakai dihitung otomatis dari transaksi bertipe pengeluaran pada kategori dan periode yang kamu pilih.</p>
                 </div>
               </div>
 
-              <!-- ACTIONS -->
-              <div style="display: flex; gap: 10px; margin-top: 2rem">
-                <!-- CANCEL -->
-                <a
-                  th:href="@{/budgets}"
-                  class="btn btn-outline"
-                  style="flex: 1"
-                >
-                  <i class="fas fa-arrow-left mr-2"></i>
+              <div class="budget-actions">
+                <a th:href="@{/budgets}" class="btn btn-outline">
+                  <i class="fas fa-xmark"></i>
                   Batal
                 </a>
-
-                <!-- SAVE -->
-                <button type="submit" class="btn btn-primary" style="flex: 1">
-                  <i class="fas fa-save mr-2"></i>
-                  <span
-                    th:text="${budget.id == null ? 'Simpan Budget' : 'Simpan Perubahan'}"
-                  >
-                    Simpan Budget
-                  </span>
+                <button type="submit" class="btn btn-primary" th:disabled="${#lists.isEmpty(categories)}">
+                  <i class="fas fa-save"></i>
+                  <span th:text="${budget.id == null ? 'Simpan Budget' : 'Simpan Perubahan'}">Simpan Budget</span>
                 </button>
               </div>
             </form>
-          </div>
-
+          </section>
         </div>
       </div>
     </main>
 
     <script th:src="@{/js/main.js}"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const start = document.getElementById('startDate');
+        const end = document.getElementById('endDate');
+        const form = document.querySelector('.budget-form');
+
+        function syncDates() {
+          if (start?.value) end.min = start.value;
+          if (end?.value) start.max = end.value;
+        }
+
+        start?.addEventListener('change', syncDates);
+        end?.addEventListener('change', syncDates);
+        syncDates();
+
+        form?.addEventListener('submit', event => {
+          if (start?.value && end?.value && end.value < start.value) {
+            event.preventDefault();
+            end.setCustomValidity('Tanggal selesai harus sama atau setelah tanggal mulai.');
+            end.reportValidity();
+          } else if (end) {
+            end.setCustomValidity('');
+          }
+        });
+      });
+    </script>
   </body>
 </html>

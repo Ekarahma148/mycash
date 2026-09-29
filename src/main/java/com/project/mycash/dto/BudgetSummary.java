@@ -11,20 +11,14 @@ import lombok.Getter;
 public class BudgetSummary {
 
     private Long id;
-
     private String categoryName;
-
     private BigDecimal budgetAmount;
-
     private BigDecimal usedAmount;
-
     private BigDecimal remainingAmount;
-
     private int percentage;
-
     private LocalDate startDate;
-
     private LocalDate endDate;
-
     private String status;
+    private String periodStatus;
+    private long daysRemaining;
 }
