@@ -2,13 +2,16 @@ package com.project.mycash.controllers;
 
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.project.mycash.models.CategoryKas;
 import com.project.mycash.models.User;
 import com.project.mycash.services.CategoryKasService;
+
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -126,18 +129,40 @@ public class CategoryKasController {
     // DELETE
     // =========================
 
-    @PostMapping("/delete/{id}")
-    public String delete(
-            @PathVariable Long id,
-            HttpSession session) {
+   @PostMapping("/delete/{id}")
+public String delete(
+        @PathVariable Long id,
+        HttpSession session,
+        RedirectAttributes redirectAttributes) {
 
-        User user =
-                (User) session.getAttribute("user");
+    User user =
+            (User) session.getAttribute("user");
+
+    try {
 
         categoryService.delete(
                 id,
                 user);
 
-        return "redirect:/categories";
+        redirectAttributes.addFlashAttribute(
+                "success",
+                "Kategori berhasil dihapus.");
+
+    } catch (DataIntegrityViolationException e) {
+
+        redirectAttributes.addFlashAttribute(
+                "error",
+                "Kategori tidak dapat dihapus karena masih digunakan oleh data transaksi, budget, atau data lainnya."
+        );
+
+    } catch (RuntimeException e) {
+
+        redirectAttributes.addFlashAttribute(
+                "error",
+                e.getMessage()
+        );
     }
+
+    return "redirect:/categories";
+}
 }
